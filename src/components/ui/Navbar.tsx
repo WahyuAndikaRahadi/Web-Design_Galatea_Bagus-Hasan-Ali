@@ -15,6 +15,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/explore", label: "Explore" },
+    { href: "/feed", label: "Feed", requireAuth: true },
     { href: "/dashboard", label: "Dashboard", requireAuth: true },
     { href: "/project/create", label: "Buat Project", requireAuth: true },
   ];
