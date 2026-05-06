@@ -45,7 +45,17 @@ export async function GET(req: NextRequest) {
           requiredSkills: { select: { skillName: true } },
           members: { select: { id: true } },
           owner: {
-            select: { id: true, name: true, image: true, trustScore: true, trustLevel: true },
+            select: { 
+              id: true, 
+              name: true, 
+              image: true, 
+              trustScore: true, 
+              trustLevel: true,
+              externalLinks: {
+                where: { status: "VERIFIED", platform: { in: ["LINKEDIN", "GITHUB"] } },
+                select: { platform: true, url: true }
+              }
+            },
           },
         },
       }),

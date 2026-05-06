@@ -81,7 +81,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       applications.map(async (app) => {
         const user = await prisma.user.findUnique({
           where: { id: app.applicantId },
-          select: { id: true, name: true, image: true, bio: true, trustScore: true, trustLevel: true, linkedinUrl: true, githubUrl: true, portfolioUrl: true, skills: { select: { skillName: true } } },
+          select: { 
+            id: true, 
+            name: true, 
+            image: true, 
+            bio: true, 
+            trustScore: true, 
+            trustLevel: true, 
+            skills: { select: { skillName: true } },
+            externalLinks: {
+              where: { status: "VERIFIED" },
+              select: { platform: true, url: true, status: true, username: true, label: true }
+            }
+          },
         });
         return { ...app, applicant: user };
       })

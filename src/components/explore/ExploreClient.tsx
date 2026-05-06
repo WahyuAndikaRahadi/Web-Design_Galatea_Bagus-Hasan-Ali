@@ -18,7 +18,14 @@ type Project = {
   createdAt: string;
   requiredSkills: { skillName: string }[];
   members: { id: string }[];
-  owner: { id: string; name: string; image: string | null; trustScore: number; trustLevel: TrustLevel };
+  owner: { 
+    id: string; 
+    name: string; 
+    image: string | null; 
+    trustScore: number; 
+    trustLevel: TrustLevel;
+    externalLinks?: { platform: string; url: string }[];
+  };
 };
 
 const TRUST_EMOJI: Record<TrustLevel, string> = {
@@ -141,7 +148,23 @@ export function ProjectCard({ project, userSkills }: { project: Project; userSki
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span style={{ fontSize: "13px" }}>{TRUST_EMOJI[project.owner.trustLevel]}</span>
           <span style={{ fontSize: "13px", fontWeight: 600 }}>{project.owner.name}</span>
-          <span style={{ background: "#F5F0E8", border: "1.5px solid #000", borderRadius: "4px", padding: "1px 6px", fontSize: "11px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>
+          
+          <div style={{ display: "flex", gap: "4px", marginLeft: "4px" }}>
+            {project.owner.externalLinks?.map(l => (
+              <a 
+                key={l.platform} 
+                href={l.url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                title={l.platform}
+                style={{ textDecoration: "none", fontSize: "12px" }}
+              >
+                {l.platform === "LINKEDIN" ? "🔵" : "⚫"}
+              </a>
+            ))}
+          </div>
+
+          <span style={{ background: "#F5F0E8", border: "1.5px solid #000", borderRadius: "4px", padding: "1px 6px", fontSize: "11px", fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", marginLeft: "4px" }}>
             {project.owner.trustScore}
           </span>
         </div>

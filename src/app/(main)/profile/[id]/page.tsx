@@ -1,7 +1,10 @@
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { TrustScoreBadge } from "@/components/ui/TrustScoreBadge";
+import { ExternalLinksSection } from "@/components/profile/ExternalLinksSection";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -11,6 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
+  const isOwner = session?.user?.id === id;
 
   const user = await prisma.user.findUnique({
     where: { id },
@@ -18,6 +23,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
       skills: true,
       endorsementsReceived: true,
       reviewsReceived: true,
+      externalLinks: { where: { status: "VERIFIED" } },
       memberships: {
         where: { project: { status: "COMPLETED" } },
         include: { project: { select: { id: true, title: true, category: true } } },
@@ -26,6 +32,13 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   });
 
   if (!user) notFound();
+
+  // Check for Identity Linked Badge
+  const linkedIn = user.externalLinks.find(l => l.platform === "LINKEDIN");
+  const isIdentityLinked = linkedIn && (
+    user.name.toLowerCase().replace(/\s+/g, "").includes(linkedIn.username?.toLowerCase() || "") ||
+    linkedIn.username?.toLowerCase().includes(user.name.toLowerCase().replace(/\s+/g, ""))
+  );
 
   // Aggregate endorsements
   const endorsementsCount = user.endorsementsReceived.reduce((acc, curr) => {
@@ -43,11 +56,48 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
             {user.name[0]}
           </div>
           <div style={{ flex: 1, minWidth: "250px" }}>
-            <h1 style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 900, fontSize: "28px", margin: "0 0 8px" }}>
-              {user.name}
-            </h1>
-            <div style={{ marginBottom: "16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <h1 style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 900, fontSize: "28px", margin: "0 0 8px" }}>
+                {user.name}
+              </h1>
+              {isOwner && (
+                <Link
+                  href="/settings/profile"
+                  style={{
+                    background: "#F5F0E8",
+                    border: "2px solid #000",
+                    borderRadius: "4px",
+                    padding: "6px 12px",
+                    fontWeight: 800,
+                    fontSize: "13px",
+                    textDecoration: "none",
+                    color: "#000",
+                    boxShadow: "2px 2px 0px #000",
+                  }}
+                >
+                  Edit Profil
+                </Link>
+              )}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
               <TrustScoreBadge score={user.trustScore} level={user.trustLevel} variant="full" />
+              {isIdentityLinked && (
+                <div style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: "4px", 
+                  background: "#0047FF", 
+                  color: "#fff", 
+                  padding: "4px 10px", 
+                  borderRadius: "4px", 
+                  fontSize: "12px", 
+                  fontWeight: 800,
+                  border: "2px solid #000",
+                  boxShadow: "2px 2px 0px #000"
+                }}>
+                  👤 Identity Linked
+                </div>
+              )}
             </div>
             {user.bio && (
               <p style={{ color: "#3D3D3D", fontSize: "15px", lineHeight: 1.6, margin: "0 0 16px" }}>
@@ -56,21 +106,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
             )}
             
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              {user.linkedinUrl && (
-                <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#0047FF", fontWeight: 700, fontSize: "14px", textDecoration: "none" }}>
-                  🔗 LinkedIn
-                </a>
-              )}
-              {user.githubUrl && (
-                <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#0047FF", fontWeight: 700, fontSize: "14px", textDecoration: "none" }}>
-                  🔗 GitHub
-                </a>
-              )}
-              {user.portfolioUrl && (
-                <a href={user.portfolioUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#0047FF", fontWeight: 700, fontSize: "14px", textDecoration: "none" }}>
-                  🔗 Portfolio
-                </a>
-              )}
+              <ExternalLinksSection username={user.name} />
             </div>
           </div>
         </div>

@@ -18,12 +18,12 @@ type Applicant = {
     image: string | null;
     trustScore: number;
     trustLevel: TrustLevel;
-    linkedinUrl: string | null;
-    githubUrl: string | null;
-    portfolioUrl: string | null;
     skills: { skillName: string }[];
+    externalLinks: { platform: any, url: string, status: string, username?: string, label?: string }[];
   };
 };
+
+import { ExternalLinkChip } from "@/components/profile/ExternalLinkChip";
 
 export function ProjectApplicantsClient({ projectId }: { projectId: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,11 +92,18 @@ export function ProjectApplicantsClient({ projectId }: { projectId: string }) {
                     </div>
                     <TrustScoreBadge score={app.applicant.trustScore} level={app.applicant.trustLevel} variant="compact" />
                     
-                    {(app.applicant.linkedinUrl || app.applicant.githubUrl || app.applicant.portfolioUrl) && (
-                      <div style={{ marginTop: "6px", display: "flex", gap: "8px", fontSize: "12px", flexWrap: "wrap" }}>
-                        {app.applicant.linkedinUrl && <a href={app.applicant.linkedinUrl} target="_blank" rel="noreferrer" style={{ color: "#0047FF", fontWeight: 700, textDecoration: "none" }}>🔗 LinkedIn</a>}
-                        {app.applicant.githubUrl && <a href={app.applicant.githubUrl} target="_blank" rel="noreferrer" style={{ color: "#000", fontWeight: 700, textDecoration: "none" }}>🐈 GitHub</a>}
-                        {app.applicant.portfolioUrl && <a href={app.applicant.portfolioUrl} target="_blank" rel="noreferrer" style={{ color: "#FF4D4D", fontWeight: 700, textDecoration: "none" }}>🎨 Portfolio</a>}
+                    {app.applicant.externalLinks?.length > 0 && (
+                      <div style={{ marginTop: "8px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        {app.applicant.externalLinks.map((link, idx) => (
+                          <ExternalLinkChip 
+                            key={idx}
+                            platform={link.platform}
+                            url={link.url}
+                            status={link.status}
+                            username={link.username}
+                            label={link.label}
+                          />
+                        ))}
                       </div>
                     )}
                     

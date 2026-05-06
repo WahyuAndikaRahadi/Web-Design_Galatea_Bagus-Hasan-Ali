@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { calculateTrustLevel } from "@/lib/trust-score";
+import { calculateTrustLevel, refreshUserTrustScore } from "@/lib/trust-score";
+import { verifyExternalLink, detectPlatform } from "@/lib/link-verifier";
+import { ExternalPlatform } from "@prisma/client";
 import { z } from "zod";
 
 const onboardingSchema = z.object({
@@ -28,17 +30,33 @@ export async function POST(req: NextRequest) {
 
     const { skills, bio, availStatus, linkedinUrl, githubUrl, portfolioUrl } = parsed.data;
 
-    // Calculate trust score boost
-    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) return NextResponse.json({ error: "User tidak ditemukan." }, { status: 404 });
+    // Process external links with verification
+    const linkUrls = [
+      { url: linkedinUrl, platform: "LINKEDIN" as ExternalPlatform },
+      { url: githubUrl, platform: "GITHUB" as ExternalPlatform },
+      { url: portfolioUrl, platform: "PORTFOLIO" as ExternalPlatform },
+    ].filter(l => l.url);
 
-    let scoreBoost = 10; // profile complete
-    if (linkedinUrl) scoreBoost += 8;
-    if (githubUrl) scoreBoost += 4;
-    if (portfolioUrl) scoreBoost += 4;
-
-    const newScore = Math.min(100, user.trustScore + scoreBoost);
-    const newLevel = calculateTrustLevel(newScore);
+    if (linkUrls.length > 0) {
+      await Promise.all(linkUrls.map(async (l) => {
+        const verification = await verifyExternalLink(l.url!);
+        if (verification.isValid) {
+          await prisma.externalLink.create({
+            data: {
+              userId: session.user.id,
+              url: l.url!,
+              platform: verification.platform as ExternalPlatform,
+              username: verification.username,
+              previewTitle: verification.previewTitle,
+              previewImage: verification.previewImage,
+              status: "VERIFIED",
+              visibility: "MEMBERS_ONLY",
+              verifiedAt: new Date(),
+            }
+          });
+        }
+      }));
+    }
 
     // Delete old skills and re-create
     await prisma.userSkill.deleteMany({ where: { userId: session.user.id } });
@@ -46,17 +64,29 @@ export async function POST(req: NextRequest) {
       data: skills.map((skillName) => ({ userId: session.user.id, skillName })),
     });
 
+    // Refresh final trust score including links
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { externalLinks: true }
+    });
+    
+    let finalScore = user.trustScore;
+    let finalLevel = user.trustLevel;
+
+    if (updatedUser) {
+      const result = refreshUserTrustScore(updatedUser);
+      finalScore = result.score;
+      finalLevel = result.level;
+    }
+
     // Update user
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
         bio: bio || null,
         availStatus,
-        linkedinUrl: linkedinUrl || null,
-        githubUrl: githubUrl || null,
-        portfolioUrl: portfolioUrl || null,
-        trustScore: newScore,
-        trustLevel: newLevel,
+        trustScore: finalScore,
+        trustLevel: finalLevel,
         onboardingDone: true,
       },
     });

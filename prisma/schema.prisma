@@ -114,6 +114,7 @@ model User {
   feedComments      FeedComment[]
   feedBookmarks     FeedBookmark[]
   feedReports       FeedReport[]
+  externalLinks     ExternalLink[]
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -495,3 +496,51 @@ enum EventCategory {
   LAINNYA
 }
 
+
+model ExternalLink {
+  id             String           @id @default(cuid())
+  userId         String
+  platform       ExternalPlatform
+  url            String
+  label          String?          // untuk custom link
+  username       String?          // diekstrak dari URL
+  status         LinkStatus       @default(PENDING)
+  visibility     LinkVisibility   @default(MEMBERS_ONLY)
+
+  // Cache metadata untuk preview
+  previewTitle   String?
+  previewImage   String?
+
+  verifiedAt     DateTime?
+  lastCheckedAt  DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum ExternalPlatform {
+  LINKEDIN
+  GITHUB
+  BEHANCE
+  DRIBBBLE
+  PORTFOLIO
+  INSTAGRAM
+  YOUTUBE
+  CUSTOM
+}
+
+enum LinkStatus {
+  PENDING
+  VERIFIED
+  UNVERIFIED
+  REJECTED
+}
+
+enum LinkVisibility {
+  PUBLIC
+  MEMBERS_ONLY
+  COLLABORATORS_ONLY
+}
