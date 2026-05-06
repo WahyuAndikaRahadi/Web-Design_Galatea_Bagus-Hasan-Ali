@@ -33,7 +33,7 @@ export async function sendVerificationEmail(email: string, name: string, otp: st
           <p style="color: #3D3D3D; font-size: 14px;">Jika kamu tidak mendaftar di CollaboLab, abaikan email ini.</p>
         </div>
         <div style="padding: 16px 32px; background: #F5F0E8; border-top: 2px solid #000; font-size: 12px; color: #3D3D3D;">
-          CollaboLab — SEFEST 2026 | HIMSE Telkom University Surabaya
+          CollaboLab — Team Galatea | HIMSE Telkom University Surabaya
         </div>
       </div>
     `,

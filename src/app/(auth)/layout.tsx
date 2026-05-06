@@ -39,7 +39,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       {/* Footer */}
       <div style={{ textAlign: "center", padding: "16px", borderTop: "2px solid #000", fontSize: "12px", color: "#3D3D3D" }}>
-        CollaboLab — SEFEST 2026 | HIMSE Telkom University Surabaya
+        CollaboLab — Team Galatea | HIMSE Telkom University Surabaya
       </div>
     </div>
   );

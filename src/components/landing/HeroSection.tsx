@@ -120,7 +120,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <span className="section-label">🏆 SEFEST 2026 — Gen-Z TechPreneur</span>
+            <span className="section-label">🏆 Team Galatea — Gen-Z TechPreneur</span>
           </motion.div>
 
           {/* Main heading */}

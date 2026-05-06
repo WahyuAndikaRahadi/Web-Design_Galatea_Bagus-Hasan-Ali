@@ -161,7 +161,7 @@ export function CtaFooterSection() {
           fontSize: "13px",
         }}
       >
-        <p>CollaboLab — SEFEST 2026 | HIMSE Telkom University Surabaya</p>
+        <p>CollaboLab — Team Galatea | HIMSE Telkom University Surabaya</p>
         <p style={{ marginTop: "4px" }}>SDG 8 · SDG 9 · Gen-Z TechPreneur</p>
       </div>
     </section>
