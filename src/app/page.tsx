@@ -8,6 +8,8 @@ import { MarqueeSection } from "@/components/landing/MarqueeSection";
 import { TrustSection } from "@/components/landing/TrustSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { CtaFooterSection } from "@/components/landing/CtaFooterSection";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "CollaboLab — Find Your People. Build Together.",
@@ -15,7 +17,39 @@ export const metadata: Metadata = {
     "Platform kolaborasi real-time untuk Gen-Z. Temukan partner project, join lomba, dan bangun portofolio bersama dengan sistem Trust Score.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+  
+  // Fetch the 4 latest projects for the explore preview
+  const projects = await prisma.project.findMany({
+    where: {
+      status: "OPEN",
+    },
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      owner: {
+        select: {
+          name: true,
+          trustScore: true,
+          trustLevel: true,
+        },
+      },
+      requiredSkills: {
+        select: {
+          skillName: true,
+        },
+      },
+      members: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+
   return (
     <>
       <Navbar />
@@ -23,7 +57,14 @@ export default function HomePage() {
         <HeroSection />
         <WhySection />
         <HowItWorksSection />
-        <ExplorePreview />
+        <ExplorePreview 
+          projects={projects.map(p => ({
+            ...p,
+            requiredSkills: p.requiredSkills.map(s => s.skillName),
+            memberCount: p.members.length,
+          }))} 
+          isAuthenticated={!!session} 
+        />
         <MarqueeSection />
         <TrustSection />
         <TestimonialsSection />

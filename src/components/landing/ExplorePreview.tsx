@@ -4,8 +4,7 @@ import Link from "next/link";
 import type { ProjectCategory, CommitmentLevel, TrustLevel } from "@prisma/client";
 import { CATEGORY_META } from "@/types";
 
-// Static mock data for the landing page preview (no login required)
-const MOCK_PROJECTS: Array<{
+interface ProjectPreview {
   id: string;
   title: string;
   description: string;
@@ -15,52 +14,12 @@ const MOCK_PROJECTS: Array<{
   maxMembers: number;
   memberCount: number;
   owner: { name: string; trustScore: number; trustLevel: TrustLevel };
-}> = [
-  {
-    id: "mock-1",
-    title: "App Wisata Lokal AR untuk Gen-Z",
-    description: "Membangun aplikasi augmented reality untuk explore wisata lokal dengan gamifikasi.",
-    category: "LOMBA",
-    commitmentLevel: "KOMPETISI",
-    requiredSkills: ["React Native", "AR", "UI/UX Design"],
-    maxMembers: 4,
-    memberCount: 2,
-    owner: { name: "Rafi A.", trustScore: 82, trustLevel: "TRUSTED" },
-  },
-  {
-    id: "mock-2",
-    title: "Platform Marketplace UMKM Digital",
-    description: "Startup marketplace untuk produk UMKM lokal dengan sistem pembayaran digital terintegrasi.",
-    category: "STARTUP",
-    commitmentLevel: "SERIUS",
-    requiredSkills: ["Next.js", "PostgreSQL", "UI/UX Design", "Marketing"],
-    maxMembers: 5,
-    memberCount: 3,
-    owner: { name: "Sinta W.", trustScore: 91, trustLevel: "VERIFIED" },
-  },
-  {
-    id: "mock-3",
-    title: "Komunitas Ilustrasi Digital Bareng",
-    description: "Kolaborasi buat zine digital bulanan — ilustrasi, desain, dan storytelling bareng.",
-    category: "KREATIF",
-    commitmentLevel: "CASUAL",
-    requiredSkills: ["Illustrator", "Figma", "Content Writing"],
-    maxMembers: 6,
-    memberCount: 4,
-    owner: { name: "Davin R.", trustScore: 67, trustLevel: "TRUSTED" },
-  },
-  {
-    id: "mock-4",
-    title: "Belajar Machine Learning Bareng (Pemula)",
-    description: "Study group untuk belajar ML dari nol — kaggle, paper reading, dan mini project bersama.",
-    category: "BELAJAR",
-    commitmentLevel: "CASUAL",
-    requiredSkills: ["Python", "Machine Learning"],
-    maxMembers: 8,
-    memberCount: 5,
-    owner: { name: "Ayu P.", trustScore: 45, trustLevel: "MEMBER" },
-  },
-];
+}
+
+interface ExplorePreviewProps {
+  projects: ProjectPreview[];
+  isAuthenticated: boolean;
+}
 
 function getTrustEmoji(level: TrustLevel) {
   const map: Record<TrustLevel, string> = {
@@ -97,7 +56,11 @@ function CommitmentBadge({ level }: { level: CommitmentLevel }) {
   );
 }
 
-export function ExplorePreview() {
+export function ExplorePreview({ projects, isAuthenticated }: ExplorePreviewProps) {
+  // If no projects, we could show a fallback or nothing. 
+  // For landing page, showing at least the section is good.
+  const displayProjects = projects.length > 0 ? projects : [];
+
   return (
     <section
       id="explore-preview"
@@ -107,7 +70,7 @@ export function ExplorePreview() {
         padding: "80px 24px",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}>
         <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <span className="section-label">🔍 EXPLORE PREVIEW</span>
           <h2
@@ -134,7 +97,7 @@ export function ExplorePreview() {
             </span>{" "}
             cari anggota.
           </h2>
-          <p style={{ color: "#3D3D3D", fontSize: "18px", marginTop: "16px", maxWidth: "600px", margin: "16px auto 0" }}>
+          <p style={{ color: "#3D3D3D", fontSize: "18px", marginTop: "16px", maxWidth: "700px", margin: "16px auto 0" }}>
             Ini baru sebagian kecil. Login untuk melihat persentase <strong>Skill Match</strong> kamu dan mulai apply.
           </p>
         </div>
@@ -142,17 +105,19 @@ export function ExplorePreview() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "24px",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: "32px",
             marginBottom: "40px",
           }}
         >
-          {MOCK_PROJECTS.map((project, index) => {
+          {displayProjects.map((project, index) => {
             const cat = CATEGORY_META[project.category];
             const spotsLeft = project.maxMembers - project.memberCount;
+            const projectLink = isAuthenticated ? `/project/${project.id}` : "/login";
 
             return (
-              <div
+              <Link
+                href={projectLink}
                 key={project.id}
                 id={`preview-card-${index + 1}`}
                 style={{
@@ -166,30 +131,36 @@ export function ExplorePreview() {
                   gap: "16px",
                   transition: "all 0.15s ease",
                   transform: `rotate(${index % 2 === 0 ? -0.5 : 0.5}deg)`,
+                  textDecoration: "none",
+                  color: "inherit",
+                  position: "relative",
+                  wordBreak: "break-word",
+                  overflowWrap: "anywhere",
+                  minHeight: "320px",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "2px 2px 0px #000";
-                  (e.currentTarget as HTMLDivElement).style.transform = "translate(2px, 2px) rotate(0deg)";
+                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "2px 2px 0px #000";
+                  (e.currentTarget as HTMLAnchorElement).style.transform = "translate(2px, 2px) rotate(0deg)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "6px 6px 0px #000";
-                  (e.currentTarget as HTMLDivElement).style.transform = `translate(0, 0) rotate(${index % 2 === 0 ? -0.5 : 0.5}deg)`;
+                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "6px 6px 0px #000";
+                  (e.currentTarget as HTMLAnchorElement).style.transform = `translate(0, 0) rotate(${index % 2 === 0 ? -0.5 : 0.5}deg)`;
                 }}
               >
                 {index === 0 && (
                   <div
                     style={{
                       position: "absolute",
-                      top: "-12px",
+                      top: "-16px",
                       left: "-12px",
                       background: "#FFE500",
                       border: "2px solid #000",
-                      padding: "4px 10px",
+                      padding: "6px 12px",
                       fontFamily: "Space Grotesk, sans-serif",
                       fontWeight: 900,
-                      fontSize: "12px",
-                      transform: "rotate(-10deg)",
-                      boxShadow: "3px 3px 0px #000",
+                      fontSize: "14px",
+                      transform: "rotate(-8deg)",
+                      boxShadow: "4px 4px 0px #000",
                       zIndex: 10,
                     }}
                   >
@@ -198,7 +169,7 @@ export function ExplorePreview() {
                 )}
 
                 {/* Top row */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
                   <span
                     style={{
                       background: cat.color,
@@ -208,6 +179,7 @@ export function ExplorePreview() {
                       fontFamily: "Space Grotesk, sans-serif",
                       fontWeight: 700,
                       fontSize: "12px",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {cat.emoji} {cat.label}
@@ -220,9 +192,9 @@ export function ExplorePreview() {
                   style={{
                     fontFamily: "Space Grotesk, sans-serif",
                     fontWeight: 800,
-                    fontSize: "17px",
+                    fontSize: "20px",
                     margin: 0,
-                    lineHeight: 1.3,
+                    lineHeight: 1.2,
                   }}
                 >
                   {project.title}
@@ -236,7 +208,7 @@ export function ExplorePreview() {
                     lineHeight: 1.5,
                     margin: 0,
                     display: "-webkit-box",
-                    WebkitLineClamp: 2,
+                    WebkitLineClamp: 3,
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
                   }}
@@ -245,9 +217,9 @@ export function ExplorePreview() {
                 </p>
 
                 {/* Skills */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                   {project.requiredSkills.map((skill) => (
-                    <span key={skill} className="skill-chip" style={{ cursor: "default" }}>
+                    <span key={skill} className="skill-chip" style={{ cursor: "default", fontSize: "11px" }}>
                       {skill}
                     </span>
                   ))}
@@ -257,50 +229,67 @@ export function ExplorePreview() {
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-end",
                     justifyContent: "space-between",
-                    paddingTop: "12px",
-                    borderTop: "1.5px solid #e0e0e0",
+                    paddingTop: "16px",
+                    borderTop: "2px solid #000",
                     marginTop: "auto",
+                    gap: "12px",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "12px" }}>
-                      {getTrustEmoji(project.owner.trustLevel)}
-                    </span>
-                    <span style={{ fontSize: "13px", fontWeight: 600 }}>
-                      {project.owner.name}
-                    </span>
-                    <span
-                      style={{
-                        background: "#F5F0E8",
-                        border: "1.5px solid #000",
-                        borderRadius: "4px",
-                        padding: "1px 6px",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        fontFamily: "Space Grotesk, sans-serif",
-                      }}
-                    >
-                      {project.owner.trustScore}
-                    </span>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ fontSize: "14px" }}>
+                        {getTrustEmoji(project.owner.trustLevel)}
+                      </span>
+                      <span 
+                        style={{ 
+                          fontSize: "14px", 
+                          fontWeight: 700,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {project.owner.name}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      <span style={{ fontSize: "11px", color: "#666", fontWeight: 600 }}>Trust Score:</span>
+                      <span
+                        style={{
+                          background: "#F5F0E8",
+                          border: "1.5px solid #000",
+                          borderRadius: "4px",
+                          padding: "1px 8px",
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          fontFamily: "Space Grotesk, sans-serif",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {project.owner.trustScore}
+                      </span>
+                    </div>
                   </div>
                   <span
                     style={{
                       background: spotsLeft <= 1 ? "#FF4D4D" : "#00D37F",
                       color: spotsLeft <= 1 ? "#fff" : "#000",
-                      border: "1.5px solid #000",
+                      border: "2px solid #000",
                       borderRadius: "4px",
-                      padding: "2px 8px",
-                      fontSize: "11px",
-                      fontWeight: 700,
+                      padding: "4px 10px",
+                      fontSize: "12px",
+                      fontWeight: 800,
                       fontFamily: "Space Grotesk, sans-serif",
+                      whiteSpace: "nowrap",
+                      boxShadow: "2px 2px 0px #000",
                     }}
                   >
                     {spotsLeft} slot tersisa
                   </span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -308,7 +297,7 @@ export function ExplorePreview() {
         {/* CTA */}
         <div style={{ textAlign: "center" }}>
           <Link
-            href="/explore"
+            href={isAuthenticated ? "/explore" : "/login"}
             className="btn-secondary"
             id="explore-preview-see-all"
             style={{ fontSize: "16px" }}
