@@ -4,35 +4,17 @@ export function CtaFooterSection() {
   return (
     <section style={{ background: "#F5F0E8", padding: "120px 24px 80px", position: "relative", overflow: "hidden" }}>
       {/* Wavy Divider */}
+      {/* Dashed Top Divider */}
       <div
         style={{
           position: "absolute",
           top: 0,
           left: 0,
           width: "100%",
-          lineHeight: 0,
-          zIndex: 0,
-          transform: "translateY(-1px)",
+          borderTop: "4px dashed #000",
+          zIndex: 10,
         }}
-      >
-        <svg
-          viewBox="0 0 1440 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ width: "100%", height: "auto" }}
-        >
-          <path
-            d="M0 40C240 100 480 0 720 40C960 80 1200 20 1440 40V0H0V40Z"
-            fill="#FFFFFF"
-          />
-          <path
-            d="M0 40C240 100 480 0 720 40C960 80 1200 20 1440 40"
-            stroke="#000000"
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
+      />
       {/* Decorations */}
       <div
         style={{
@@ -129,42 +111,24 @@ export function CtaFooterSection() {
           Ribuan Gen-Z sudah menemukan tim impian mereka. Giliranmu!
         </p>
 
-        <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <Link
             href="/register"
             className="btn-primary btn-lg"
             id="cta-footer-register"
+            style={{ fontSize: "18px", padding: "18px 40px" }}
           >
             🚀 Mulai Gratis — 30 detik
           </Link>
-          <Link
-            href="/explore"
-            id="cta-footer-explore"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "#fff",
-              color: "#000",
-              border: "3px solid #000",
-              borderRadius: "4px",
-              fontFamily: "Space Grotesk, sans-serif",
-              fontWeight: 700,
-              fontSize: "16px",
-              padding: "16px 32px",
-              textDecoration: "none",
-              transition: "all 0.15s ease",
-              boxShadow: "4px 4px 0px #000",
-            }}
-          >
-            Lihat Project Dulu
-          </Link>
         </div>
+
+        {/* Dashed Divider for Features */}
+        <div style={{ marginTop: "48px", borderTop: "2px dashed #000", width: "100%", opacity: 0.2 }} />
 
         {/* Trust indicators */}
         <div
           style={{
-            marginTop: "48px",
+            marginTop: "24px",
             display: "flex",
             justifyContent: "center",
             gap: "32px",
@@ -191,7 +155,7 @@ export function CtaFooterSection() {
           textAlign: "center",
           marginTop: "64px",
           paddingTop: "32px",
-          borderTop: "3px solid #000",
+          borderTop: "3px dashed #000", // Changed to dashed
           color: "#3D3D3D",
           fontSize: "14px",
           fontWeight: 600,
