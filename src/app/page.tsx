@@ -11,6 +11,8 @@ import { AboutSection } from "@/components/landing/AboutSection";
 import { CtaFooterSection } from "@/components/landing/CtaFooterSection";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CustomCursor } from "@/components/ui/CustomCursor";
+import { Noise } from "@/components/ui/Noise";
 
 export const metadata: Metadata = {
   title: "CollaboLab — Find Your People. Build Together.",
@@ -53,6 +55,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <CustomCursor />
+      <Noise />
       <Navbar />
       <main>
         <HeroSection />

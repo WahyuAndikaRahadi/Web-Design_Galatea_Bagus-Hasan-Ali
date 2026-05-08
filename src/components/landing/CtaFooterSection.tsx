@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export function CtaFooterSection() {
   return (
@@ -16,32 +19,67 @@ export function CtaFooterSection() {
         }}
       />
       {/* Decorations */}
-      <div
-        style={{
-          position: "absolute",
-          top: "160px",
-          left: "-40px",
-          width: "200px",
-          height: "200px",
-          background: "#FFE500",
-          border: "3px solid #000",
-          transform: "rotate(15deg)",
-          opacity: 0.1,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-40px",
-          right: "-40px",
-          width: "240px",
-          height: "240px",
-          background: "#00D37F",
-          border: "3px solid #000",
-          borderRadius: "50%",
-          opacity: 0.1,
-        }}
-      />
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        {/* Big Yellow Square rotating bottom-left */}
+        <motion.div
+          animate={{ rotate: [15, 30, 15], scale: [1, 1.1, 1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            bottom: "-40px",
+            left: "-40px",
+            width: "240px",
+            height: "240px",
+            background: "#FFE500",
+            border: "3px solid #000",
+            boxShadow: "8px 8px 0px #000",
+            opacity: 0.15,
+          }}
+        />
+
+        {/* Green Circle top-right */}
+        <motion.div
+          animate={{ y: [0, 20, 0], x: [0, -10, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "100px",
+            right: "2%",
+            width: "180px",
+            height: "180px",
+            background: "#00D37F",
+            border: "3px solid #000",
+            borderRadius: "50%",
+            boxShadow: "6px 6px 0px #000",
+            opacity: 0.15,
+          }}
+        />
+
+        {/* Blue Triangle floating middle-left */}
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          style={{
+            position: "absolute",
+            top: "40%",
+            left: "5%",
+            width: "80px",
+            height: "80px",
+            opacity: 0.1,
+          }}
+        >
+          <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%" }}>
+            <path d="M50 5 L95 85 L5 85 Z" fill="none" stroke="#0047FF" strokeWidth="4" />
+          </svg>
+        </motion.div>
+
+        {/* Dot patterns */}
+        <div style={{ position: "absolute", bottom: "10%", right: "10%", display: "grid", gridTemplateColumns: "repeat(4, 10px)", gap: "10px", opacity: 0.1 }}>
+          {Array.from({ length: 16 }).map((_, i) => (
+            <div key={i} style={{ width: "6px", height: "6px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+      </div>
 
       <div
         style={{

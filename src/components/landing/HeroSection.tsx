@@ -3,13 +3,13 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+import { MagnetWrapper } from "./MagnetWrapper";
+
 export function HeroSection() {
   return (
     <section
       style={{
         background: "#F5F0E8",
-        backgroundImage: "radial-gradient(#000 1px, transparent 1px)",
-        backgroundSize: "24px 24px",
         borderBottom: "3px solid #000",
         position: "relative",
         overflow: "hidden",
@@ -19,99 +19,178 @@ export function HeroSection() {
       }}
     >
       {/* Geometric decorations */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
         {/* Big yellow block top-right */}
-        <motion.div
-          animate={{ y: [0, -15, 0], rotate: [15, 12, 15] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "absolute",
-            top: "-40px",
-            right: "-40px",
-            width: "280px",
-            height: "280px",
-            background: "#FFE500",
-            border: "3px solid #000",
-            boxShadow: "8px 8px 0px #000",
-          }}
-        />
+        <MagnetWrapper strength={40}>
+          <motion.div
+            animate={{ y: [0, -15, 0], rotate: [15, 12, 15] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              top: "-40px",
+              right: "-40px",
+              width: "280px",
+              height: "280px",
+              background: "#FFE500",
+              border: "3px solid #000",
+              boxShadow: "8px 8px 0px #000",
+              opacity: 0.8,
+            }}
+          />
+        </MagnetWrapper>
         {/* Blue block bottom-left */}
-        <motion.div
-          animate={{ y: [0, 20, 0], rotate: [-8, -12, -8] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "absolute",
-            bottom: "60px",
-            left: "-20px",
-            width: "160px",
-            height: "160px",
-            background: "#0047FF",
-            border: "3px solid #000",
-            boxShadow: "6px 6px 0px #000",
-          }}
-        />
+        <MagnetWrapper strength={-30}>
+          <motion.div
+            animate={{ y: [0, 20, 0], rotate: [-8, -12, -8] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              bottom: "60px",
+              left: "-20px",
+              width: "160px",
+              height: "160px",
+              background: "#0047FF",
+              border: "3px solid #000",
+              boxShadow: "6px 6px 0px #000",
+              opacity: 0.8,
+            }}
+          />
+        </MagnetWrapper>
         {/* Green circle bottom-right */}
+        <MagnetWrapper strength={20}>
+          <motion.div
+            animate={{ scale: [1, 1.1, 1], x: [0, 10, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              bottom: "-30px",
+              right: "15%",
+              width: "120px",
+              height: "120px",
+              background: "#00D37F",
+              border: "3px solid #000",
+              borderRadius: "50%",
+              boxShadow: "4px 4px 0px #000",
+              opacity: 0.8,
+            }}
+          />
+        </MagnetWrapper>
+        {/* Small coral square */}
+        <MagnetWrapper strength={50}>
+          <motion.div
+            animate={{ rotate: [20, 380] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            style={{
+              position: "absolute",
+              top: "25%",
+              right: "8%",
+              width: "50px",
+              height: "50px",
+              background: "#FF4D4D",
+              border: "3px solid #000",
+              boxShadow: "4px 4px 0px #000",
+              opacity: 0.7,
+            }}
+          />
+        </MagnetWrapper>
+        {/* Dashed outline square top-left */}
+        <MagnetWrapper strength={-15}>
+          <motion.div
+            animate={{ x: [0, -20, 0], y: [0, 10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              top: "60px",
+              left: "40px",
+              width: "100px",
+              height: "100px",
+              border: "4px dashed #000",
+              transform: "rotate(-12deg)",
+              opacity: 0.2,
+            }}
+          />
+        </MagnetWrapper>
+
+        {/* Floating Mint bar center-left */}
+        <MagnetWrapper strength={30}>
+          <motion.div
+            animate={{ x: [-10, 10, -10], rotate: [45, 50, 45] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              top: "40%",
+              left: "5%",
+              width: "120px",
+              height: "20px",
+              background: "#00D37F",
+              border: "2px solid #000",
+              boxShadow: "3px 3px 0px #000",
+              opacity: 0.3,
+            }}
+          />
+        </MagnetWrapper>
+
+        {/* NEW: Small Yellow dots top-left */}
         <motion.div
-          animate={{ scale: [1, 1.1, 1], x: [0, 10, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 4, repeat: Infinity }}
           style={{
             position: "absolute",
-            bottom: "-30px",
-            right: "15%",
-            width: "120px",
-            height: "120px",
-            background: "#00D37F",
-            border: "3px solid #000",
+            top: "15%",
+            left: "15%",
+            width: "15px",
+            height: "15px",
+            background: "#FFE500",
             borderRadius: "50%",
-            boxShadow: "4px 4px 0px #000",
+            border: "1.5px solid #000",
+            opacity: 0.4,
           }}
         />
-        {/* Small coral square */}
+
+        {/* NEW: Coral outline circle middle-right */}
         <motion.div
-          animate={{ rotate: [20, 380] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          animate={{ y: [0, -30, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
           style={{
             position: "absolute",
-            top: "30%",
-            right: "5%",
+            top: "50%",
+            right: "20%",
             width: "60px",
             height: "60px",
-            background: "#FF4D4D",
-            border: "3px solid #000",
-            boxShadow: "3px 3px 0px #000",
+            border: "2px solid #FF4D4D",
+            borderRadius: "50%",
+            opacity: 0.2,
           }}
         />
-        {/* Dashed outline square top-left */}
-        <motion.div
-          animate={{ x: [0, -20, 0], y: [0, 10, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            position: "absolute",
-            top: "60px",
-            left: "40px",
-            width: "80px",
-            height: "80px",
-            border: "3px dashed #000",
-            transform: "rotate(-12deg)",
-          }}
-        />
-        {/* Small dot pattern */}
-        <div
-          style={{
-            position: "absolute",
-            top: "40%",
-            left: "48%",
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 12px)",
-            gap: "10px",
-            opacity: 0.25,
-          }}
-        >
-          {Array.from({ length: 25 }).map((_, i) => (
+
+        {/* Scattered Dot patterns - MOAR */}
+        <div style={{ position: "absolute", top: "20%", left: "10%", display: "grid", gridTemplateColumns: "repeat(4, 10px)", gap: "8px", opacity: 0.15 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} style={{ width: "6px", height: "6px", background: "#000", borderRadius: "50%" }} />
           ))}
         </div>
 
+        <div style={{ position: "absolute", bottom: "25%", left: "5%", display: "grid", gridTemplateColumns: "repeat(6, 8px)", gap: "6px", opacity: 0.1 }}>
+          {Array.from({ length: 24 }).map((_, i) => (
+            <div key={i} style={{ width: "4px", height: "4px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", display: "grid", gridTemplateColumns: "repeat(3, 12px)", gap: "10px", opacity: 0.2 }}>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} style={{ width: "5px", height: "5px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        <div style={{ position: "absolute", top: "10%", right: "30%", display: "grid", gridTemplateColumns: "repeat(6, 8px)", gap: "6px", opacity: 0.1 }}>
+          {Array.from({ length: 18 }).map((_, i) => (
+            <div key={i} style={{ width: "4px", height: "4px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        {/* NEW: Small floating X's */}
+        <div style={{ position: "absolute", top: "45%", right: "5%", transform: "rotate(15deg)", fontSize: "24px", fontWeight: 900, opacity: 0.1 }}>×</div>
+        <div style={{ position: "absolute", bottom: "40%", left: "12%", transform: "rotate(-10deg)", fontSize: "32px", fontWeight: 900, opacity: 0.05 }}>+</div>
       </div>
 
       <div
@@ -155,16 +234,18 @@ export function HeroSection() {
               color: "#000",
               marginBottom: "24px",
               marginTop: "16px",
+              position: "relative",
             }}
           >
-            Temukan Partner.{" "}
+            Temukan Partner. <br />
             <span
               style={{
                 background: "#FFE500",
                 borderBottom: "4px solid #000",
-                padding: "0 8px",
+                padding: "0 12px",
                 display: "inline-block",
-                transform: "rotate(-1deg)",
+                transform: "rotate(-1.5deg)",
+                boxShadow: "4px 4px 0px #000",
               }}
             >
               Build Future.
@@ -182,9 +263,37 @@ export function HeroSection() {
               lineHeight: 1.7,
               marginBottom: "40px",
               maxWidth: "600px",
+              position: "relative",
             }}
           >
-            Platform kolaborasi untuk Gen-Z — temukan partner untuk project, lomba, riset, hingga bisnis kreatif.
+            Platform kolaborasi untuk{" "}
+            <span style={{ position: "relative", display: "inline-block" }}>
+              Gen-Z
+              {/* Hand-drawn Underline Accent */}
+              <svg
+                viewBox="0 0 100 20"
+                style={{
+                  position: "absolute",
+                  bottom: "-4px",
+                  left: 0,
+                  width: "100%",
+                  height: "12px",
+                  pointerEvents: "none",
+                }}
+              >
+                <motion.path
+                  d="M5,15 Q50,10 95,15"
+                  fill="none"
+                  stroke="#FF4D4D"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0 }}
+                  whileInView={{ pathLength: 1 }}
+                  transition={{ duration: 0.8, delay: 1.5 }}
+                />
+              </svg>
+            </span>{" "}
+            — temukan partner untuk project, lomba, riset, hingga bisnis kreatif.
             Apapun idemu, bangun bersama di ekosistem yang transparan & terpercaya.
           </motion.p>
 
@@ -257,6 +366,20 @@ export function HeroSection() {
           </motion.div>
         </div>
       </div>
+
+      {/* Colorful Zig-Zag Divider */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-2px",
+          left: 0,
+          width: "100%",
+          height: "40px",
+          background: "repeating-linear-gradient(to right, rgba(255, 229, 0, 0.7) 0%, rgba(255, 229, 0, 0.7) 10%, rgba(0, 211, 127, 0.7) 10%, rgba(0, 211, 127, 0.7) 20%, rgba(255, 77, 77, 0.7) 20%, rgba(255, 77, 77, 0.7) 30%, rgba(0, 71, 255, 0.7) 30%, rgba(0, 71, 255, 0.7) 40%)",
+          clipPath: "polygon(0 100%, 5% 0, 10% 100%, 15% 0, 20% 100%, 25% 0, 30% 100%, 35% 0, 40% 100%, 45% 0, 50% 100%, 55% 0, 60% 100%, 65% 0, 70% 100%, 75% 0, 80% 100%, 85% 0, 90% 100%, 95% 0, 100% 100%)",
+          zIndex: 10,
+        }}
+      />
     </section>
   );
 }

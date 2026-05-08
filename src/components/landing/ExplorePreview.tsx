@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { TiltWrapper } from "./TiltWrapper";
 import type { ProjectCategory, CommitmentLevel, TrustLevel } from "@prisma/client";
 import { CATEGORY_META } from "@/types";
 
@@ -65,11 +67,178 @@ export function ExplorePreview({ projects, isAuthenticated }: ExplorePreviewProp
     <section
       id="explore-preview"
       style={{
-        background: "#fff",
+        background: "#FFFFFF",
         borderBottom: "3px solid #000",
         padding: "80px 24px",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Geometric decorations */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        {/* Yellow Circle top-left */}
+        <motion.div
+          animate={{ x: [0, 15, 0], y: [0, 10, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "5%",
+            left: "2%",
+            width: "80px",
+            height: "80px",
+            background: "#FFE500",
+            border: "2px solid #000",
+            borderRadius: "50%",
+            boxShadow: "4px 4px 0px #000",
+            opacity: 0.5,
+          }}
+        />
+
+        {/* Blue Dashed Square bottom-right */}
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          style={{
+            position: "absolute",
+            bottom: "5%",
+            right: "3%",
+            width: "140px",
+            height: "140px",
+            border: "3px dashed #0047FF",
+            opacity: 0.2,
+          }}
+        />
+
+        {/* Coral Square top-right */}
+        <motion.div
+          animate={{ rotate: [45, 60, 45], scale: [1, 1.1, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "10%",
+            right: "10%",
+            width: "40px",
+            height: "40px",
+            background: "#FF4D4D",
+            border: "2px solid #000",
+            boxShadow: "3px 3px 0px #000",
+            opacity: 0.4,
+          }}
+        />
+
+        {/* NEW: Green Outline Triangle bottom-left */}
+        <motion.div
+          animate={{ rotate: [10, -10, 10] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            bottom: "15%",
+            left: "5%",
+            width: "60px",
+            height: "60px",
+            opacity: 0.15,
+          }}
+        >
+          <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%" }}>
+            <path d="M50 5 L95 85 L5 85 Z" fill="none" stroke="#00D37F" strokeWidth="4" />
+          </svg>
+        </motion.div>
+
+        {/* NEW: Small Coral dots floating */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], x: [0, 10, 0] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          style={{
+            position: "absolute",
+            top: "20%",
+            right: "20%",
+            width: "10px",
+            height: "10px",
+            background: "#FF4D4D",
+            borderRadius: "50%",
+            border: "1.5px solid #000",
+            opacity: 0.4,
+          }}
+        />
+
+        {/* NEW: Floating Symbols */}
+        <div style={{ position: "absolute", top: "10%", left: "30%", fontSize: "32px", fontWeight: 900, opacity: 0.05 }}>+</div>
+        <div style={{ position: "absolute", bottom: "40%", right: "2%", fontSize: "28px", fontWeight: 900, opacity: 0.08 }}>×</div>
+        <div style={{ position: "absolute", bottom: "10%", left: "45%", fontSize: "24px", fontWeight: 900, opacity: 0.06 }}>O</div>
+
+        {/* NEW: Floating Yellow square bottom-left */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], x: [0, 20, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            bottom: "10%",
+            left: "8%",
+            width: "30px",
+            height: "30px",
+            background: "#FFE500",
+            border: "1.5px solid #000",
+            boxShadow: "3px 3px 0px #000",
+            opacity: 0.4,
+          }}
+        />
+
+        {/* NEW: Coral outline triangle middle-right */}
+        <motion.div
+          animate={{ rotate: [-20, 20, -20] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: "5%",
+            width: "60px",
+            height: "60px",
+            opacity: 0.2,
+          }}
+        >
+          <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%" }}>
+            <path d="M50 5 L95 85 L5 85 Z" fill="none" stroke="#FF4D4D" strokeWidth="6" strokeDasharray="10 5" />
+          </svg>
+        </motion.div>
+
+        {/* NEW: Floating Symbols - MOAR */}
+        <div style={{ position: "absolute", top: "25%", left: "5%", fontSize: "24px", fontWeight: 900, opacity: 0.08 }}>O</div>
+        <div style={{ position: "absolute", bottom: "30%", left: "20%", fontSize: "32px", fontWeight: 900, opacity: 0.05, transform: "rotate(45deg)" }}>+</div>
+        <div style={{ position: "absolute", top: "15%", right: "8%", fontSize: "28px", fontWeight: 900, opacity: 0.06 }}>×</div>
+        <div style={{ position: "absolute", bottom: "15%", right: "30%", fontSize: "22px", fontWeight: 900, opacity: 0.04 }}>×</div>
+
+        {/* Dot patterns scattered - EVEN MOAR */}
+        <div style={{ position: "absolute", top: "20%", left: "40%", display: "grid", gridTemplateColumns: "repeat(6, 6px)", gap: "6px", opacity: 0.1 }}>
+          {Array.from({ length: 18 }).map((_, i) => (
+            <div key={i} style={{ width: "3px", height: "3px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        <div style={{ position: "absolute", bottom: "25%", right: "15%", display: "grid", gridTemplateColumns: "repeat(4, 10px)", gap: "8px", opacity: 0.1 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} style={{ width: "5px", height: "5px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        <div style={{ position: "absolute", top: "10%", left: "10%", display: "grid", gridTemplateColumns: "repeat(5, 5px)", gap: "5px", opacity: 0.05 }}>
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div key={i} style={{ width: "3px", height: "3px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        {/* NEW: Horizontal Dashed Line middle */}
+        <div 
+          style={{ 
+            position: "absolute", 
+            top: "50%", 
+            left: "0", 
+            width: "100%", 
+            height: "2px", 
+            borderTop: "2px dashed #000", 
+            opacity: 0.03 
+          }} 
+        />
+      </div>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}>
         <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <span className="section-label">🔍 EXPLORE PREVIEW</span>
@@ -105,9 +274,10 @@ export function ExplorePreview({ projects, isAuthenticated }: ExplorePreviewProp
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-            gap: "32px",
+            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+            gap: "48px",
             marginBottom: "40px",
+            padding: "20px",
           }}
         >
           {displayProjects.map((project, index) => {
@@ -116,37 +286,38 @@ export function ExplorePreview({ projects, isAuthenticated }: ExplorePreviewProp
             const projectLink = isAuthenticated ? `/project/${project.id}` : "/login";
 
             return (
-              <Link
-                href={projectLink}
+              <TiltWrapper
                 key={project.id}
-                id={`preview-card-${index + 1}`}
-                style={{
-                  background: "#fff",
-                  border: "3px solid #000",
-                  borderRadius: "8px",
-                  boxShadow: "6px 6px 0px #000",
-                  padding: "24px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  transition: "all 0.15s ease",
-                  transform: `rotate(${index % 2 === 0 ? -0.5 : 0.5}deg)`,
-                  textDecoration: "none",
-                  color: "inherit",
-                  position: "relative",
-                  wordBreak: "break-word",
-                  overflowWrap: "anywhere",
-                  minHeight: "320px",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "2px 2px 0px #000";
-                  (e.currentTarget as HTMLAnchorElement).style.transform = "translate(2px, 2px) rotate(0deg)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "6px 6px 0px #000";
-                  (e.currentTarget as HTMLAnchorElement).style.transform = `translate(0, 0) rotate(${index % 2 === 0 ? -0.5 : 0.5}deg)`;
-                }}
+                index={index}
+                style={{ perspective: "1000px" }}
               >
+                <Link
+                  href={projectLink}
+                  id={`preview-card-${index + 1}`}
+                  style={{
+                    background: "#fff",
+                    border: "3px solid #000",
+                    borderRadius: "8px",
+                    boxShadow: "6px 6px 0px #000",
+                    padding: "24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                    textDecoration: "none",
+                    color: "inherit",
+                    position: "relative",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                    minHeight: "320px",
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow = "2px 2px 0px #000";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow = "6px 6px 0px #000";
+                  }}
+                >
                 {index === 0 && (
                   <div
                     style={{
@@ -290,8 +461,9 @@ export function ExplorePreview({ projects, isAuthenticated }: ExplorePreviewProp
                   </span>
                 </div>
               </Link>
-            );
-          })}
+            </TiltWrapper>
+          );
+        })}
         </div>
 
         {/* CTA */}

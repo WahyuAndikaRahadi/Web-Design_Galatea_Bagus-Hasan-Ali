@@ -10,8 +10,114 @@ export function TrustSection() {
         background: "#F5F0E8",
         borderBottom: "3px solid #000",
         padding: "80px 24px",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Geometric decorations */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        {/* Big Yellow outline square top-right */}
+        <motion.div
+          animate={{ rotate: [15, 25, 15], y: [0, -20, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "-40px",
+            right: "5%",
+            width: "200px",
+            height: "200px",
+            border: "5px solid #FFE500",
+            borderRadius: "12px",
+            opacity: 0.2,
+          }}
+        />
+
+        {/* Blue Circle bottom-left */}
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            bottom: "5%",
+            left: "2%",
+            width: "100px",
+            height: "100px",
+            background: "#0047FF",
+            border: "3px solid #000",
+            borderRadius: "50%",
+            boxShadow: "6px 6px 0px #000",
+            opacity: 0.4,
+          }}
+        />
+
+        {/* Coral dashed triangle middle-right */}
+        <motion.div
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          style={{
+            position: "absolute",
+            top: "40%",
+            right: "2%",
+            width: "80px",
+            height: "80px",
+            opacity: 0.3,
+          }}
+        >
+          <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%" }}>
+            <path d="M50 5 L95 85 L5 85 Z" fill="none" stroke="#FF4D4D" strokeWidth="4" strokeDasharray="8 8" />
+          </svg>
+        </motion.div>
+
+        {/* NEW: Small Yellow dots floating top-left */}
+        <motion.div
+          animate={{ x: [0, 15, 0], y: [0, 10, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "10%",
+            left: "10%",
+            width: "12px",
+            height: "12px",
+            background: "#FFE500",
+            borderRadius: "50%",
+            border: "1.5px solid #000",
+            opacity: 0.5,
+          }}
+        />
+
+        {/* NEW: Blue dashed square middle-right */}
+        <motion.div
+          animate={{ rotate: [-15, 15, -15], scale: [1, 1.1, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: "12%",
+            width: "60px",
+            height: "60px",
+            border: "2px dashed #0047FF",
+            opacity: 0.2,
+          }}
+        />
+
+        {/* NEW: Floating Symbols */}
+        <div style={{ position: "absolute", top: "45%", left: "3%", fontSize: "32px", fontWeight: 900, opacity: 0.05, transform: "rotate(-20deg)" }}>×</div>
+        <div style={{ position: "absolute", bottom: "35%", right: "20%", fontSize: "28px", fontWeight: 900, opacity: 0.07, transform: "rotate(10deg)" }}>+</div>
+        <div style={{ position: "absolute", top: "15%", left: "45%", fontSize: "24px", fontWeight: 900, opacity: 0.1 }}>O</div>
+
+        {/* Small dots scattered - MOAR */}
+        <div style={{ position: "absolute", top: "15%", left: "5%", display: "grid", gridTemplateColumns: "repeat(5, 8px)", gap: "6px", opacity: 0.1 }}>
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div key={i} style={{ width: "4px", height: "4px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+
+        <div style={{ position: "absolute", bottom: "25%", right: "5%", display: "grid", gridTemplateColumns: "repeat(4, 10px)", gap: "8px", opacity: 0.1 }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} style={{ width: "5px", height: "5px", background: "#000", borderRadius: "50%" }} />
+          ))}
+        </div>
+      </div>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "60px" }}>
           <span className="section-label">🛡️ TRUST & KOMUNITAS</span>
@@ -60,13 +166,11 @@ export function TrustSection() {
               }}
             />
 
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 3, repeat: Infinity }}
+            <div
               style={{ fontSize: "56px", marginBottom: "16px" }}
             >
               🛡️
-            </motion.div>
+            </div>
 
             <h3
               style={{
@@ -169,13 +273,11 @@ export function TrustSection() {
               }}
             />
 
-            <motion.div
-              animate={{ y: [0, -10, 0], rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 4, repeat: Infinity }}
+            <div
               style={{ fontSize: "48px", marginBottom: "16px" }}
             >
               🕵️
-            </motion.div>
+            </div>
 
             <h3
               style={{
