@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getPusherClient, CHANNELS, EVENTS } from "@/lib/pusher";
+import { useToast } from "@/lib/toast";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,9 @@ export function CollabRoomClient({
   const [tasks, setTasks] = useState<Task[]>(initialProject.tasks);
   const [messages, setMessages] = useState<Message[]>([]);
   const [polls, setPolls] = useState<Poll[]>(initialProject.polls);
+  const [members, setMembers] = useState<Member[]>(initialProject.members);
   const [activeTab, setActiveTab] = useState<"kanban" | "chat" | "poll">("kanban");
+  const toast = useToast();
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Load message history
@@ -104,6 +107,13 @@ export function CollabRoomClient({
           window.location.href = "/dashboard?reason=kicked";
         }
       });
+
+      channel.bind(EVENTS.IDENTITY_REVEALED, ({ memberId, userName, anonymousTag }: { memberId: string; userName: string; anonymousTag: string }) => {
+        setMembers((prev) => prev.map((m) => 
+          m.id === memberId ? { ...m, revealedAt: new Date().toISOString(), isAnonymous: false } : m
+        ));
+        toast.success("✨ Identity Revealed", `Anon#${anonymousTag} ternyata adalah ${userName}!`);
+      });
     } catch {
       // Pusher not configured
     }
@@ -136,41 +146,72 @@ export function CollabRoomClient({
           👥 Anggota
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {initialProject.members.map((m) => {
-            const displayName = m.isAnonymous && !m.revealedAt ? `Anon#${m.anonymousTag || "0000"}` : m.user.name;
+          {members.map((m) => {
+            const isAnonymous = m.isAnonymous && !m.revealedAt;
+            const displayName = isAnonymous ? `Anon#${m.anonymousTag || "0000"}` : m.user.name;
             const isMe = m.userId === currentUserId;
 
             return (
-              <div key={m.id} style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "space-between" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <div style={{
-                    width: "28px", height: "28px", borderRadius: "50%",
-                    background: m.role === "OWNER" ? "#FFE500" : "#333",
-                    border: "2px solid #555",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "12px", fontWeight: 700,
-                    color: m.role === "OWNER" ? "#000" : "#fff",
-                    flexShrink: 0,
-                  }}>
-                    {m.isAnonymous && !m.revealedAt ? "👤" : displayName[0]}
+              <div key={m.id} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{
+                      width: "28px", height: "28px", borderRadius: "50%",
+                      background: isAnonymous ? "#333" : (m.role === "OWNER" ? "#FFE500" : "#fff"),
+                      border: "2px solid #000",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "12px", fontWeight: 700,
+                      color: isAnonymous ? "#888" : "#000",
+                      flexShrink: 0,
+                      boxShadow: "2px 2px 0px #000"
+                    }}>
+                      {isAnonymous ? "🕵️" : displayName[0]}
+                    </div>
+                    <span style={{ color: "#fff", fontSize: "13px", fontWeight: isMe ? 700 : 400 }}>
+                      {displayName}
+                      {m.role === "OWNER" && <span style={{ marginLeft: "4px", fontSize: "10px", color: "#FFE500" }}>👑</span>}
+                    </span>
                   </div>
-                  <span style={{ color: "#fff", fontSize: "13px", fontWeight: isMe ? 700 : 400 }}>
-                    {displayName}
-                    {m.role === "OWNER" && <span style={{ marginLeft: "4px", fontSize: "10px", color: "#FFE500" }}>👑</span>}
-                  </span>
+
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    {isOwner && !isMe && (
+                      <button
+                        onClick={async () => {
+                          if (confirm(`Kick ${displayName}?`)) {
+                            await fetch(`/api/projects/${initialProject.id}/members/${m.id}`, { method: "DELETE" });
+                          }
+                        }}
+                        style={{ background: "transparent", border: "none", color: "#FF4D4D", cursor: "pointer", padding: "4px", fontSize: "12px" }}
+                        title="Kick dari project"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {isOwner && !isMe && (
+                {isMe && isAnonymous && (
                   <button
                     onClick={async () => {
-                      if (confirm(`Kick ${displayName}?`)) {
-                        await fetch(`/api/projects/${initialProject.id}/members/${m.id}`, { method: "DELETE" });
+                      if (confirm("Buka identitasmu sekarang? Semua orang akan tahu siapa kamu.")) {
+                        const res = await fetch(`/api/projects/${initialProject.id}/members/${m.id}/reveal`, { method: "POST" });
+                        if (!res.ok) toast.error("Error", "Gagal membuka identitas");
                       }
                     }}
-                    style={{ background: "transparent", border: "none", color: "#FF4D4D", cursor: "pointer", padding: "4px", fontSize: "12px" }}
-                    title="Kick dari project"
+                    style={{
+                      background: "#FFE500",
+                      border: "1.5px solid #000",
+                      borderRadius: "4px",
+                      padding: "4px 8px",
+                      fontSize: "10px",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                      boxShadow: "1.5px 1.5px 0px #000",
+                      marginTop: "2px",
+                      textAlign: "center"
+                    }}
                   >
-                    ✕
+                    ✨ Reveal Identity
                   </button>
                 )}
               </div>

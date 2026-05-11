@@ -21,6 +21,7 @@ export function ProjectDetailClient({ projectId, isLoggedIn, isMember, isOwner, 
   const [isApplyOpen, setIsApplyOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedCommit, setSelectedCommit] = useState<CommitmentLevel>(commitmentLevel);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [applySuccess, setApplySuccess] = useState(false);
   const [error, setError] = useState("");
@@ -34,7 +35,7 @@ export function ProjectDetailClient({ projectId, isLoggedIn, isMember, isOwner, 
       const res = await fetch(`/api/projects/${projectId}/apply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, commitmentLevel: selectedCommit }),
+        body: JSON.stringify({ message, commitmentLevel: selectedCommit, isAnonymous }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -155,6 +156,22 @@ export function ProjectDetailClient({ projectId, isLoggedIn, isMember, isOwner, 
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px", background: "#F5F0E8", border: "2px solid #000", borderRadius: "8px" }}>
+              <input 
+                type="checkbox" 
+                id="apply-anonymous" 
+                checked={isAnonymous} 
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                style={{ width: "20px", height: "20px", cursor: "pointer" }}
+              />
+              <label htmlFor="apply-anonymous" style={{ fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>
+                🕶️ Gabung sebagai Anonim (Mode Ice-Breaker)
+                <span style={{ display: "block", fontSize: "11px", fontWeight: 400, color: "#666" }}>
+                  Mulai dengan nama samaran (misal: Anon#1234). Kamu bisa buka identitasmu nanti.
+                </span>
+              </label>
             </div>
 
             <button type="submit" className="btn-primary" id="apply-submit-btn" disabled={isLoading} style={{ fontSize: "16px", padding: "14px" }}>

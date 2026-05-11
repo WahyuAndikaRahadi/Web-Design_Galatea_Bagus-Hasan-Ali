@@ -8,6 +8,7 @@ import { z } from "zod";
 const applySchema = z.object({
   message: z.string().min(10).max(500),
   commitmentLevel: z.enum(["CASUAL", "SERIUS", "KOMPETISI"]),
+  isAnonymous: z.boolean().default(false),
 });
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -31,7 +32,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (existing) return NextResponse.json({ error: "Kamu sudah melamar project ini." }, { status: 400 });
 
     const application = await prisma.application.create({
-      data: { projectId: id, applicantId: session.user.id, ...parsed.data },
+      data: { 
+        projectId: id, 
+        applicantId: session.user.id, 
+        message: parsed.data.message,
+        commitmentLevel: parsed.data.commitmentLevel,
+        isAnonymous: parsed.data.isAnonymous
+      },
     });
 
     // Create DB Notification
@@ -128,7 +135,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (decision === "APPROVED") {
       // Add member
       await prisma.projectMember.create({
-        data: { projectId: id, userId: application.applicantId, role: "MEMBER" },
+        data: { 
+          projectId: id, 
+          userId: application.applicantId, 
+          role: "MEMBER",
+          isAnonymous: application.isAnonymous,
+          anonymousTag: application.isAnonymous ? Math.floor(1000 + Math.random() * 9000).toString() : null
+        },
       });
 
       // Create DB Notification

@@ -272,6 +272,7 @@ model Application {
   message         String
   commitmentLevel CommitmentLevel
   status          String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  isAnonymous     Boolean  @default(false)
   createdAt       DateTime @default(now())
 
   project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)

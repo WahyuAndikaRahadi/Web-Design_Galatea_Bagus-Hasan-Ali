@@ -58,4 +58,5 @@ export const EVENTS = {
   NEW_NOTIFICATION: "new-notification",
   MESSAGE_DELETED: "message-deleted",
   MEMBER_KICKED: "member-kicked",
+  IDENTITY_REVEALED: "identity-revealed",
 } as const;
