@@ -9,6 +9,7 @@ import { Button, LinkButton } from "@/components/ui/Button";
 import { getTrustLevelEmoji, getTrustLevelColor } from "@/lib/trust-score";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useToast } from "@/lib/toast";
+import { Modal } from "@/components/ui/Modal";
 
 export function Navbar() {
   const { data: session } = useSession();
@@ -16,6 +17,7 @@ export function Navbar() {
   const toast = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Hide navbar on auth pages
   if (pathname === "/login" || pathname === "/register") return null;
@@ -231,17 +233,16 @@ export function Navbar() {
                   session.user.name?.[0]?.toUpperCase() ?? "U"
                 )}
               </Link>
-              <Button 
-                variant="danger" 
-                size="sm" 
-                onClick={async () => {
-                  toast.info("Sedang keluar...", "Menghapus sesi kolaborasi...");
-                  await signOut({ callbackUrl: "/" });
-                }}
-                style={{ height: "36px", padding: "0 12px" }}
-              >
-                Keluar
-              </Button>
+              <div className="hidden lg:block">
+                <Button 
+                  variant="danger" 
+                  size="sm" 
+                  onClick={() => setShowLogoutModal(true)}
+                  style={{ height: "36px", padding: "0 12px" }}
+                >
+                  Keluar
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="hidden lg:flex items-center gap-3">
@@ -325,10 +326,9 @@ export function Navbar() {
                   <Button
                     variant="danger"
                     fullWidth
-                    onClick={async () => {
+                    onClick={() => {
                       setMenuOpen(false);
-                      toast.info("Sedang keluar...", "Menghapus sesi kolaborasi...");
-                      await signOut({ callbackUrl: "/" });
+                      setShowLogoutModal(true);
                     }}
                   >
                     Keluar Akun
@@ -339,6 +339,37 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Modal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        title="Keluar Akun"
+        size="sm"
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <p style={{ fontSize: "15px", color: "var(--text-secondary)", margin: 0 }}>
+            Apakah kamu yakin ingin keluar dari akun ini? Sesi kolaborasimu akan diakhiri.
+          </p>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="danger"
+              onClick={async () => {
+                setShowLogoutModal(false);
+                toast.info("Sedang keluar...", "Menghapus sesi kolaborasi...");
+                await signOut({ callbackUrl: "/" });
+              }}
+            >
+              Ya, Keluar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </header>
   );
 }
