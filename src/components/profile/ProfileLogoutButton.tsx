@@ -41,7 +41,7 @@ export function ProfileLogoutButton() {
           marginTop: "16px"
         }}
       >
-        🚪 Keluar Akun
+         Keluar Akun
       </button>
 
       <Modal
