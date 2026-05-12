@@ -149,6 +149,9 @@ model User {
   sessions          Session[]
   accounts          Account[]
   reportsSent       Report[]   @relation("reportsSent")
+  projectBans       ProjectBan[]
+  projectReportsSent ProjectReport[] @relation("reporter")
+  projectReportsTarget ProjectReport[] @relation("reported")
   hubMessages       HubMessage[]
   externalLinks     ExternalLink[]
   notifications     Notification[]
@@ -233,6 +236,8 @@ model Project {
   hubRooms        HubRoom[]
   hubTasks        HubTask[]
   feedPosts       FeedPost[]
+  bans            ProjectBan[]
+  internalReports ProjectReport[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -637,4 +642,32 @@ model Report {
   createdAt   DateTime @default(now())
 
   reporter    User     @relation("reportsSent", fields: [reporterId], references: [id])
+}
+
+model ProjectBan {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  reason    String?
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model ProjectReport {
+  id          String   @id @default(cuid())
+  projectId   String
+  reporterId  String
+  reportedId  String
+  reason      String
+  description String?
+  status      String   @default("PENDING") // PENDING, KICKED, BANNED, DISMISSED
+  createdAt   DateTime @default(now())
+
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reporter    User     @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported    User     @relation("reported", fields: [reportedId], references: [id], onDelete: Cascade)
 }

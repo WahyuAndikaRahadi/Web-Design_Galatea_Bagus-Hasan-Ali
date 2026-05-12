@@ -12,6 +12,7 @@ type Applicant = {
   id: string;
   message: string;
   commitmentLevel: CommitmentLevel;
+  isAnonymous: boolean;
   createdAt: string;
   applicant: {
     id: string;
@@ -85,15 +86,17 @@ export function ProjectApplicantsClient({ projectId }: { projectId: string }) {
               <div key={app.id} style={{ border: "2px solid #000", borderRadius: "8px", padding: "16px", background: "#F5F0E8", boxShadow: "3px 3px 0px #000" }}>
                 <div style={{ display: "flex", gap: "12px", marginBottom: "12px", alignItems: "flex-start" }}>
                   <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "#fff", border: "2px solid #000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", fontWeight: 800, flexShrink: 0, overflow: "hidden" }}>
-                    {app.applicant.image ? (
+                    {app.isAnonymous ? (
+                      <div style={{ fontSize: "24px" }}>🕵️</div>
+                    ) : app.applicant.image ? (
                       <img src={app.applicant.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
                       <User size={24} strokeWidth={2.5} />
                     )}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 800, fontSize: "16px", marginBottom: "4px" }}>
-                      {app.applicant.name}
+                      {app.isAnonymous ? "Kandidat Anonim" : app.applicant.name}
                     </div>
                     <div 
                       title={`${getTrustLevelLabel(app.applicant.trustLevel)}: ${app.applicant.trustScore} points`}
@@ -120,8 +123,8 @@ export function ProjectApplicantsClient({ projectId }: { projectId: string }) {
                       </span>
                     </div>
                     
-                    {app.applicant.externalLinks?.length > 0 && (
-                      <div style={{ marginTop: "8px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    {!app.isAnonymous && app.applicant.externalLinks?.length > 0 && (
+                      <div style={{ marginTop: "8px", display: "flex", gap: "6px", flexWrap: "wrap", width: "100%" }}>
                         {app.applicant.externalLinks.map((link, idx) => (
                           <ExternalLinkChip 
                             key={idx}
@@ -154,9 +157,11 @@ export function ProjectApplicantsClient({ projectId }: { projectId: string }) {
                     Commitment: <span style={{ color: "#0047FF", background: "#0047FF22", padding: "2px 6px", borderRadius: "4px" }}>{COMMITMENT_META[app.commitmentLevel].label}</span>
                   </div>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    <Link href={`/profile/${app.applicant.id}`} target="_blank" style={{ background: "#EAEAEA", border: "2px solid #000", borderRadius: "4px", padding: "6px 12px", fontWeight: 800, fontSize: "12px", fontFamily: "Space Grotesk, sans-serif", textDecoration: "none", color: "#000", display: "flex", alignItems: "center" }}>
-                      Profil ↗
-                    </Link>
+                    {!app.isAnonymous && (
+                      <Link href={`/profile/${app.applicant.id}`} target="_blank" style={{ background: "#EAEAEA", border: "2px solid #000", borderRadius: "4px", padding: "6px 12px", fontWeight: 800, fontSize: "12px", fontFamily: "Space Grotesk, sans-serif", textDecoration: "none", color: "#000", display: "flex", alignItems: "center" }}>
+                        Profil ↗
+                      </Link>
+                    )}
                     <button 
                       onClick={() => handleDecision(app.id, "REJECTED")} 
                       style={{ background: "#fff", border: "2px solid #000", borderRadius: "4px", padding: "6px 16px", fontWeight: 800, cursor: "pointer", fontSize: "13px", fontFamily: "Space Grotesk, sans-serif", transition: "all 0.1s" }}

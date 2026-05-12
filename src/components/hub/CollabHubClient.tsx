@@ -9,6 +9,7 @@ import { PresencePanel } from "./PresencePanel";
 import { CreateRoomModal } from "./CreateRoomModal";
 import { PasswordModal } from "./PasswordModal";
 import { ProjectSettingsModal } from "./ProjectSettingsModal";
+import { ManageMembersModal } from "./ManageMembersModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,7 @@ export function CollabHubClient({
   const [unlockedRooms, setUnlockedRooms] = useState<Set<string>>(new Set());
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showManageMembers, setShowManageMembers] = useState(false);
   const [passwordRoom, setPasswordRoom] = useState<HubRoom | null>(null);
   const [onlineStatus, setOnlineStatus] = useState<{ [userId: string]: "online" | "away" | "offline" }>({});
   const [unreadStatus, setUnreadStatus] = useState<Record<string, "message" | "mention" | null>>({});
@@ -244,6 +246,7 @@ export function CollabHubClient({
             unlockedRooms={unlockedRooms}
             unreadStatus={unreadStatus}
             onOpenSettings={() => setShowSettings(true)}
+            onManageMembers={() => setShowManageMembers(true)}
           />
         </div>
 
@@ -378,6 +381,16 @@ export function CollabHubClient({
           initialDescription={projectInfo.description}
           onClose={() => setShowSettings(false)}
           onUpdated={(title, description) => setProjectInfo({ title, description })}
+        />
+      )}
+      {showManageMembers && (
+        <ManageMembersModal
+          projectId={initialProject.id}
+          members={initialProject.members}
+          currentUserId={currentUserId}
+          isAdmin={isAdmin}
+          isOwner={isOwner}
+          onClose={() => setShowManageMembers(false)}
         />
       )}
     </div>

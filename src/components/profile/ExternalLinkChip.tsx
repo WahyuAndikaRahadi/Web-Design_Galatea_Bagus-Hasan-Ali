@@ -33,7 +33,9 @@ export function ExternalLinkChip({ platform, url, username, label, status, previ
       rel="noopener noreferrer"
       style={{
         display: "flex",
-        width: "100%",
+        width: "calc(100% - 6px)", // Account for box-shadow to prevent overflow
+        marginBottom: "6px", // Account for bottom box-shadow
+        boxSizing: "border-box",
         alignItems: "center",
         gap: "20px",
         padding: "20px",

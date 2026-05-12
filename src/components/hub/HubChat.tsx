@@ -21,6 +21,7 @@ type HubMessage = {
   createdAt: string;
   mentions: string[];
   sender: { id: string; name: string; image: string | null; isAnonymous?: boolean };
+  status?: "pending" | "sent";
 };
 
 type OnlineStatus = { [userId: string]: "online" | "away" | "offline" };
@@ -67,7 +68,7 @@ export function HubChat({ projectId, roomId, roomName, roomType, roomDescription
       channel.bind(EVENTS.HUB_MESSAGE, (msg: HubMessage) => {
         setMessages((prev) => {
           if (prev.find((m) => m.id === msg.id)) return prev;
-          return [...prev, msg];
+          return [...prev, { ...msg, status: "sent" }];
         });
       });
     } catch {}
@@ -82,11 +83,52 @@ export function HubChat({ projectId, roomId, roomName, roomType, roomDescription
   }, [messages]);
 
   async function handleSend(content: string, mentions: string[]) {
-    await fetch(`/api/hub/${projectId}/rooms/${roomId}/messages`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, mentions }),
-    });
+    // 1. Optimistic Update
+    const pendingId = `pending-${Date.now()}`;
+    const pendingMsg: HubMessage = {
+      id: pendingId,
+      content,
+      createdAt: new Date().toISOString(),
+      mentions,
+      status: "pending",
+      sender: {
+        id: currentUserId,
+        name: currentMember.isAnonymous ? `Anon#${currentMember.anonymousTag || "0000"}` : currentMember.user.name,
+        image: currentMember.isAnonymous ? null : currentMember.user.image,
+        isAnonymous: currentMember.isAnonymous
+      }
+    };
+
+    setMessages((prev) => [...prev, pendingMsg]);
+
+    // 2. Fetch API
+    try {
+      const res = await fetch(`/api/hub/${projectId}/rooms/${roomId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, mentions }),
+      });
+      
+      if (res.ok) {
+        const savedMsg = await res.json();
+        savedMsg.status = "sent";
+        
+        setMessages((prev) => {
+          // If Pusher already broadcasted it before fetch completed, avoid duplicate
+          if (prev.find(m => m.id === savedMsg.id)) {
+            return prev.filter(m => m.id !== pendingId).map(m => m.id === savedMsg.id ? { ...m, status: "sent" } : m);
+          }
+          // Otherwise, replace the pending message with the real one
+          return prev.map((m) => (m.id === pendingId ? savedMsg : m));
+        });
+      } else {
+        // Rollback optimistic update on error
+        setMessages((prev) => prev.filter((m) => m.id !== pendingId));
+      }
+    } catch {
+      // Rollback on network error
+      setMessages((prev) => prev.filter((m) => m.id !== pendingId));
+    }
   }
 
   const formatTime = (iso: string) => new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
@@ -257,8 +299,10 @@ export function HubChat({ projectId, roomId, roomName, roomType, roomDescription
                       }}>
                         {renderContent(msg.content, isMe)}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#555", marginTop: "4px", textAlign: isMe ? "right" : "left", fontWeight: 600 }}>
+                      <div style={{ fontSize: "11px", color: "#555", marginTop: "4px", textAlign: isMe ? "right" : "left", fontWeight: 600, display: "flex", alignItems: "center", justifyContent: isMe ? "flex-end" : "flex-start", gap: "4px" }}>
                         {formatTime(msg.createdAt)}
+                        {isMe && msg.status === "pending" && <span style={{ color: "#888", fontSize: "12px", marginLeft: "2px" }} title="Mengirim...">🕒</span>}
+                        {isMe && (msg.status === "sent" || !msg.status) && <span style={{ color: "#00D37F", fontWeight: 900, fontSize: "12px", marginLeft: "2px" }} title="Terkirim">✓</span>}
                       </div>
                     </div>
                   </div>

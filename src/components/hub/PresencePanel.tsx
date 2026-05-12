@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { getPusherClient, CHANNELS } from "@/lib/pusher";
-import { User } from "lucide-react";
+import { User, AlertTriangle } from "lucide-react";
+import { ReportMemberModal } from "./ReportMemberModal";
 
 type Member = {
   userId: string;
@@ -25,6 +26,7 @@ type Props = {
 
 export function PresencePanel({ projectId, members, currentUserId, onStatusChange }: Props) {
   const [onlineUsers, setOnlineUsers] = useState<PresenceData>({});
+  const [reportingMember, setReportingMember] = useState<Member | null>(null);
 
   useEffect(() => {
     let pusher: ReturnType<typeof getPusherClient>;
@@ -126,6 +128,26 @@ export function PresencePanel({ projectId, members, currentUserId, onStatusChang
         }}>
           {name}{isMe && " (kamu)"}
         </span>
+        
+        {!isMe && (
+          <button
+            onClick={() => setReportingMember(m)}
+            title="Laporkan Anggota"
+            style={{
+              marginLeft: "auto",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "#FF4D4D",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "2px",
+            }}
+          >
+            <AlertTriangle size={14} />
+          </button>
+        )}
       </div>
     );
   }
@@ -190,6 +212,15 @@ export function PresencePanel({ projectId, members, currentUserId, onStatusChang
           </div>
         )}
       </div>
+
+      {reportingMember && (
+        <ReportMemberModal
+          projectId={projectId}
+          reportedId={reportingMember.userId}
+          reportedName={getDisplayName(reportingMember)}
+          onClose={() => setReportingMember(null)}
+        />
+      )}
     </div>
   );
 }

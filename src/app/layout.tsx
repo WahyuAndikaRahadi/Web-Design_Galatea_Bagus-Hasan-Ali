@@ -24,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     default: "CollaboLab — Find Your People. Build Together.",
-    template: "%s | CollaboLab",
+    template: "CollaboLab — Find Your People. Build Together.",
   },
   description:
     "Platform kolaborasi real-time untuk Gen-Z. Temukan tim, bangun project, dan kembangkan skill bersama. Sistem reputasi Trust Score menjaga ekosistem tetap sehat.",

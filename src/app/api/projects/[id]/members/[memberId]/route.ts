@@ -63,6 +63,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 export async function DELETE(req: NextRequest, { params }: Params) {
     const { id: projectId, memberId } = await params;
+    const { searchParams } = new URL(req.url);
+    const isBan = searchParams.get("ban") === "true";
+    const reason = searchParams.get("reason") || "Melanggar aturan kolaborasi.";
+    
     const session = await auth();
   
     if (!session?.user?.id) {
@@ -91,9 +95,40 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     }
   
     try {
-      await prisma.projectMember.delete({
-        where: { id: memberId },
-      });
+      const project = await prisma.project.findUnique({ where: { id: projectId }, select: { title: true } });
+      const projectName = project?.title || "Project";
+
+      const txOps: any[] = [
+        prisma.projectMember.delete({
+          where: { id: memberId },
+        }),
+        prisma.user.update({
+          where: { id: targetMember.userId },
+          data: { trustScore: { decrement: 8 } },
+        }),
+        prisma.notification.create({
+          data: {
+            userId: targetMember.userId,
+            title: isBan ? "🚫 Banned dari Project" : "👢 Dikeluarkan dari Project",
+            message: `Kamu telah ${isBan ? "di-ban" : "dikeluarkan"} dari "${projectName}". Alasan: ${reason}`,
+            type: "SYSTEM",
+          }
+        })
+      ];
+
+      if (isBan) {
+        txOps.push(
+          prisma.projectBan.create({
+            data: {
+              projectId,
+              userId: targetMember.userId,
+              reason,
+            }
+          })
+        );
+      }
+
+      await prisma.$transaction(txOps);
   
       await pusherServer.trigger(CHANNELS.project(projectId), EVENTS.MEMBER_KICKED, {
         memberId,

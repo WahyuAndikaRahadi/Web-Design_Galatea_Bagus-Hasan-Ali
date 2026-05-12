@@ -28,6 +28,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const isAlreadyMember = project.members.some((m) => m.userId === session.user.id);
     if (isAlreadyMember) return NextResponse.json({ error: "Kamu sudah menjadi anggota project ini." }, { status: 400 });
 
+    const isBanned = await prisma.projectBan.findUnique({
+      where: { projectId_userId: { projectId: id, userId: session.user.id } }
+    });
+    if (isBanned) return NextResponse.json({ error: "Kamu telah diblokir secara permanen dari project ini." }, { status: 403 });
+
     const existing = await prisma.application.findFirst({ where: { projectId: id, applicantId: session.user.id, status: "PENDING" } });
     if (existing) return NextResponse.json({ error: "Kamu sudah melamar project ini." }, { status: 400 });
 

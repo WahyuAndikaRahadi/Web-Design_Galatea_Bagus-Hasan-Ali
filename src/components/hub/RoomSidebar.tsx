@@ -20,6 +20,7 @@ type Props = {
   unlockedRooms: Set<string>;
   unreadStatus: Record<string, "message" | "mention" | null>;
   onOpenSettings?: () => void;
+  onManageMembers?: () => void;
 };
 
 const ROOM_ICON: Record<HubRoomDef["type"], string> = {
@@ -29,7 +30,7 @@ const ROOM_ICON: Record<HubRoomDef["type"], string> = {
   CUSTOM: "#",
 };
 
-export function RoomSidebar({ rooms, activeRoomId, onSelectRoom, onCreateRoom, isOwner, isAdmin, projectTitle, unlockedRooms, unreadStatus, onOpenSettings }: Props) {
+export function RoomSidebar({ rooms, activeRoomId, onSelectRoom, onCreateRoom, isOwner, isAdmin, projectTitle, unlockedRooms, unreadStatus, onOpenSettings, onManageMembers }: Props) {
   const defaultRooms = rooms.filter((r) => r.type !== "CUSTOM");
   const customRooms = rooms.filter((r) => r.type === "CUSTOM");
 
@@ -142,31 +143,52 @@ export function RoomSidebar({ rooms, activeRoomId, onSelectRoom, onCreateRoom, i
         </div>
 
         {(isOwner || isAdmin) && (
-          <button
-            onClick={onOpenSettings}
-            title="Pengaturan Project"
-            style={{
-              position: "absolute",
-              top: "14px",
-              right: "12px",
-              background: "#000000",
-              color: "#00D37F",
-              border: "none",
-              borderRadius: "4px",
-              width: "20px",
-              height: "20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              fontSize: "12px",
-              boxShadow: "1px 1px 0px #000000"
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#333")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#000")}
-          >
-            ⚙️
-          </button>
+          <div style={{ position: "absolute", top: "14px", right: "12px", display: "flex", gap: "6px" }}>
+            <button
+              onClick={onManageMembers}
+              title="Kelola Anggota"
+              style={{
+                background: "#000000",
+                color: "#FFE500",
+                border: "none",
+                borderRadius: "4px",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "12px",
+                boxShadow: "1.5px 1.5px 0px #000000"
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#333")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#000")}
+            >
+              👥
+            </button>
+            <button
+              onClick={onOpenSettings}
+              title="Pengaturan Project"
+              style={{
+                background: "#000000",
+                color: "#00D37F",
+                border: "none",
+                borderRadius: "4px",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: "12px",
+                boxShadow: "1.5px 1.5px 0px #000000"
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#333")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#000")}
+            >
+              ⚙️
+            </button>
+          </div>
         )}
       </div>
 
