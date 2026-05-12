@@ -198,7 +198,6 @@ export function CtaFooterSection() {
         }}
       >
         <p>© {new Date().getFullYear()} CollaboLab — Team Galatea</p>
-        <p style={{ marginTop: "4px", opacity: 0.7 }}>Gen-Z TechPreneur</p>
       </div>
     </section>
   );

@@ -23,7 +23,7 @@ const steps = [
   },
   {
     number: "03",
-    title: "Kolaborasi di Collab Room",
+    title: "Kolaborasi di Collab Hub",
     description:
       "Chat real-time, kanban board, dan presence indicator — semua dalam satu room. Mulai bangun sesuatu yang keren.",
     icon: "🚀",

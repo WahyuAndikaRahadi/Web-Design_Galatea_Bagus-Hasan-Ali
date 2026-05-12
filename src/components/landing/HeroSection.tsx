@@ -359,7 +359,7 @@ export function HeroSection() {
                   Ribuan Gen-Z sudah kolaborasi
                 </p>
                 <p style={{ fontSize: "12px", color: "#3D3D3D", margin: 0 }}>
-                  dari berbagai universitas Indonesia 🇮🇩
+                  dari berbagai universitas Indonesia
                 </p>
               </div>
             </div>
