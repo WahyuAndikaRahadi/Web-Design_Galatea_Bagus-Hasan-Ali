@@ -9,9 +9,9 @@ export async function callChatbotAI(message: string, history: { role: 'user' | '
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({
     model: MODEL_NAME,
-    systemInstruction: `Kamu adalah CollaboBot, asisten AI pintar dari CollaboLab.
+    systemInstruction: `Kamu adalah CollaBot, asisten AI pintar dari CollaboLab.
 Tugasmu adalah membantu pengunjung landing page memahami apa itu CollaboLab.
 
 INFORMASI TENTANG COLLABOLAB:
@@ -44,7 +44,7 @@ Jika user bertanya "Siapa pembuatmu?", jawab bahwa kamu dikembangkan oleh tim de
     });
 
     const chat = model.startChat({
-      history: filteredHistory.slice(-6), 
+      history: filteredHistory.slice(-6),
     });
 
     const result = await chat.sendMessage(message);
@@ -52,6 +52,6 @@ Jika user bertanya "Siapa pembuatmu?", jawab bahwa kamu dikembangkan oleh tim de
     return response.text();
   } catch (error) {
     console.error("Chatbot AI Error:", error);
-    throw new Error("Maaf, CollaboBot sedang istirahat sejenak. Coba lagi nanti ya! 🙏");
+    throw new Error("Maaf, CollaBot sedang istirahat sejenak. Coba lagi nanti ya! 🙏");
   }
 }

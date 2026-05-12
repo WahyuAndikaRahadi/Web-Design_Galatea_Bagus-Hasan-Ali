@@ -12,7 +12,7 @@ interface Message {
 export function AIAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Halo! Aku CollaboBot 🤖. Ada yang bisa aku bantu seputar CollaboLab?' }
+    { role: 'model', text: 'Halo! Aku CollaBot 🤖. Ada yang bisa aku bantu seputar CollaboLab?' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -52,9 +52,9 @@ export function AIAssistantWidget() {
         throw new Error(data.error)
       }
     } catch (err: any) {
-      setMessages(prev => [...prev, { 
-        role: 'model', 
-        text: 'Waduh, koneksiku lagi terganggu. Coba tanya lagi ya! 🙏' 
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: 'Waduh, koneksiku lagi terganggu. Coba tanya lagi ya! 🙏'
       }])
     } finally {
       setLoading(false)
@@ -110,9 +110,9 @@ export function AIAssistantWidget() {
                 }}>
                   <Bot size={16} color="#000" />
                 </div>
-                <span style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 800, fontSize: '18px' }}>CollaboBot</span>
+                <span style={{ fontFamily: 'var(--font-space-grotesk)', fontWeight: 800, fontSize: '18px' }}>CollaBot</span>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#fff' }}
               >
@@ -121,7 +121,7 @@ export function AIAssistantWidget() {
             </div>
 
             {/* Messages */}
-            <div 
+            <div
               ref={scrollRef}
               style={{
                 flex: 1,
@@ -134,7 +134,7 @@ export function AIAssistantWidget() {
               }}
             >
               {messages.map((m, i) => (
-                <div 
+                <div
                   key={i}
                   style={{
                     alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
@@ -173,7 +173,7 @@ export function AIAssistantWidget() {
             </div>
 
             {/* Input */}
-            <form 
+            <form
               onSubmit={handleSend}
               style={{
                 padding: '12px',
@@ -183,7 +183,7 @@ export function AIAssistantWidget() {
                 background: '#fff'
               }}
             >
-              <input 
+              <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 placeholder="Tanya dong..."
@@ -249,9 +249,9 @@ export function AIAssistantWidget() {
             }}
           >
             <MessageSquare size={20} strokeWidth={3} />
-            <span style={{ 
-              fontFamily: 'var(--font-space-grotesk)', 
-              fontWeight: 900, 
+            <span style={{
+              fontFamily: 'var(--font-space-grotesk)',
+              fontWeight: 900,
               fontSize: '13px',
               writingMode: 'vertical-rl',
               textTransform: 'uppercase',
@@ -259,7 +259,7 @@ export function AIAssistantWidget() {
               transform: 'rotate(180deg)',
               margin: '4px 0'
             }}>
-              COLLABOBOT
+              CollaBot
             </span>
           </motion.button>
         )}
