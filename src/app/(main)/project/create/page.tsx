@@ -1,8 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { SKILL_SUGGESTIONS, SKILL_GROUPS, CATEGORY_META, COMMITMENT_META, TOPIC_META } from "@/types";
+
+interface SearchUser {
+  id: string;
+  name: string;
+  username: string | null;
+  image: string | null;
+  trustLevel: string;
+}
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -21,6 +30,14 @@ export default function CreateProjectPage() {
     maxMembers: 4,
     deadline: "",
   });
+
+  // Invitation State
+  const [invitedUsers, setInvitedUsers] = useState<SearchUser[]>([]);
+  const [userSearch, setUserSearch] = useState("");
+  const [userResults, setUserResults] = useState<SearchUser[]>([]);
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   // Load AI draft if present
   useEffect(() => {
@@ -44,6 +61,48 @@ export default function CreateProjectPage() {
       }
     }
   }, [searchParams]);
+
+  // Debounced User Search
+  useEffect(() => {
+    if (userSearch.length < 2) {
+      setUserResults([]);
+      setShowUserDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearchingUsers(true);
+      try {
+        const res = await fetch(`/api/users/search?q=${encodeURIComponent(userSearch)}`);
+        const data = await res.json();
+        if (res.ok) {
+          // Filter out already invited users
+          const filtered = (data as SearchUser[]).filter(
+            u => !invitedUsers.some(invited => invited.id === u.id)
+          );
+          setUserResults(filtered);
+          setShowUserDropdown(filtered.length > 0);
+        }
+      } catch (err) {
+        console.error("User search failed", err);
+      } finally {
+        setIsSearchingUsers(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [userSearch, invitedUsers]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowUserDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   function toggleSkill(skill: string) {
     setSelectedSkills((prev) => prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]);
@@ -73,6 +132,7 @@ export default function CreateProjectPage() {
           maxMembers: Number(form.maxMembers),
           requiredSkills: selectedSkills,
           deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
+          invitedUserIds: invitedUsers.map(u => u.id),
         }),
       });
       const data = await res.json();
@@ -87,7 +147,7 @@ export default function CreateProjectPage() {
 
   return (
     <div style={{ background: "#F5F0E8", minHeight: "calc(100vh - 64px)", padding: "32px 16px" }}>
-      <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: "32px" }}>
           <span className="section-label">🚀 BUAT PROJECT</span>
@@ -105,7 +165,19 @@ export default function CreateProjectPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr minmax(300px, 340px)", gap: "32px", alignItems: "start" }} className="mobile-stack">
+          <style jsx>{`
+            @media (max-width: 900px) {
+              .mobile-stack {
+                grid-template-columns: 1fr !important;
+              }
+              .invite-sidebar {
+                order: -1;
+              }
+            }
+          `}</style>
+
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           <div style={{ background: "#fff", border: "3px solid #000", borderRadius: "8px", boxShadow: "8px 8px 0px #000", padding: "40px", display: "flex", flexDirection: "column", gap: "28px" }}>
 
             {/* Title */}
@@ -302,7 +374,172 @@ export default function CreateProjectPage() {
             </button>
           </div>
         </form>
+
+        {/* Invite Sidebar */}
+        <div className="invite-sidebar" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <div style={{ background: "#FFE500", border: "3px solid #000", borderRadius: "8px", boxShadow: "6px 6px 0px #000", padding: "24px" }}>
+            <h3 style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 800, fontSize: "18px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+              👤 Undang Teman
+            </h3>
+            <p style={{ fontSize: "13px", color: "#000", marginBottom: "16px", lineHeight: "1.4" }}>
+              Cari teman berdasarkan username untuk diundang langsung ke projectmu.
+            </p>
+
+            <div style={{ position: "relative" }} ref={searchRef}>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  className="nb-input"
+                  placeholder="Cari @username..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  onFocus={() => userResults.length > 0 && setShowUserDropdown(true)}
+                  style={{ background: "#fff", paddingLeft: "36px" }}
+                />
+                <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", opacity: 0.5 }}>🔍</span>
+                {isSearchingUsers && (
+                  <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "12px" }}>...</span>
+                )}
+              </div>
+
+              {showUserDropdown && (
+                <div style={{ 
+                  position: "absolute", 
+                  top: "calc(100% + 8px)", 
+                  left: 0, 
+                  right: 0, 
+                  background: "#fff", 
+                  border: "2px solid #000", 
+                  borderRadius: "6px", 
+                  boxShadow: "4px 4px 0px #000", 
+                  zIndex: 50,
+                  maxHeight: "300px",
+                  overflowY: "auto"
+                }}>
+                  {userResults.map(user => (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onClick={() => {
+                        setInvitedUsers(prev => [...prev, user]);
+                        setUserSearch("");
+                        setShowUserDropdown(false);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        border: "none",
+                        borderBottom: "1px solid #eee",
+                        background: "none",
+                        cursor: "pointer",
+                        textAlign: "left"
+                      }}
+                      className="user-result-item"
+                    >
+                      <img 
+                        src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
+                        alt={user.name}
+                        style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1px solid #000" }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</div>
+                        <div style={{ fontSize: "11px", color: "#666" }}>@{user.username || "user"}</div>
+                      </div>
+                      <div style={{ fontSize: "10px", padding: "2px 6px", background: "#000", color: "#FFE500", borderRadius: "4px", fontWeight: 800 }}>
+                        {user.trustLevel}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Invited List */}
+            {invitedUsers.length > 0 && (
+              <div style={{ marginTop: "24px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 800, color: "#000", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                  Daftar Undangan ({invitedUsers.length})
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {invitedUsers.map(user => (
+                    <div 
+                      key={user.id}
+                      style={{ 
+                        background: "#fff", 
+                        border: "2px solid #000", 
+                        borderRadius: "6px", 
+                        padding: "10px", 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: "10px",
+                        boxShadow: "2px 2px 0px #000"
+                      }}
+                    >
+                      <img 
+                        src={user.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
+                        alt={user.name}
+                        style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1px solid #000" }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: "12px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</div>
+                        <div style={{ fontSize: "10px", color: "#666" }}>@{user.username || "user"}</div>
+                      </div>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <Link 
+                          href={`/profile/${user.id}`} 
+                          target="_blank"
+                          style={{ 
+                            padding: "4px", 
+                            background: "#00D37F", 
+                            border: "1.5px solid #000", 
+                            borderRadius: "4px",
+                            fontSize: "10px",
+                            color: "#000",
+                            textDecoration: "none",
+                            fontWeight: 800
+                          }}
+                          title="Lihat Profil"
+                        >
+                          👁️
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setInvitedUsers(prev => prev.filter(u => u.id !== user.id))}
+                          style={{ 
+                            padding: "4px", 
+                            background: "#FF4D4D", 
+                            border: "1.5px solid #000", 
+                            borderRadius: "4px",
+                            fontSize: "10px",
+                            color: "#fff",
+                            cursor: "pointer"
+                          }}
+                          title="Hapus"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div style={{ background: "#fff", border: "2px solid #000", borderRadius: "8px", boxShadow: "4px 4px 0px #000", padding: "20px" }}>
+            <h4 style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 700, fontSize: "14px", marginBottom: "8px" }}>💡 Tips Mengundang</h4>
+            <ul style={{ paddingLeft: "20px", fontSize: "12px", color: "#3D3D3D", margin: 0, display: "flex", flexDirection: "column", gap: "6px" }}>
+              <li>Undang teman yang memiliki skill yang sesuai.</li>
+              <li>Pastikan mereka aktif dan memiliki Trust Score yang baik.</li>
+              <li>Pesan undangan formal akan dikirim setelah project dibuat.</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
   );
 }

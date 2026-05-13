@@ -8,7 +8,7 @@ type Member = {
   isAnonymous: boolean;
   anonymousTag: string | null;
   revealedAt: string | null;
-  user: { id: string; name: string; image: string | null };
+  user: { id: string; name: string; username: string; image: string | null };
 };
 
 type OnlineStatus = { [userId: string]: "online" | "away" | "offline" };
@@ -36,7 +36,7 @@ export function MentionInput({ members, onlineStatus, onSend, disabled, disabled
 
   const getDisplayName = (m: Member) => {
     if (m.isAnonymous && !m.revealedAt) return `Anon#${m.anonymousTag || "0000"}`;
-    return m.user.name;
+    return m.user.username || m.user.name.toLowerCase().replace(/\s+/g, "");
   };
 
   const filteredMembers = members
@@ -179,7 +179,9 @@ export function MentionInput({ members, onlineStatus, onSend, disabled, disabled
                     {name[0]}
                   </div>
                   <div>
-                    <div style={{ color: "#000000", fontSize: "13px", fontWeight: 800, fontFamily: "Space Grotesk, sans-serif" }}>{name}</div>
+                    <div style={{ color: "#000000", fontSize: "13px", fontWeight: 800, fontFamily: "Space Grotesk, sans-serif" }}>
+                      {m.user.name} <span style={{ fontSize: "11px", opacity: 0.6 }}>@{m.user.username}</span>
+                    </div>
                     <div style={{ color: isOnline ? "#00D37F" : "#3D3D3D", fontSize: "11px", fontWeight: 600 }}>{isOnline ? "● Online" : "○ Offline"}</div>
                   </div>
                 </button>

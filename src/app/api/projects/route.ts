@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
+import { pusherServer, CHANNELS, EVENTS } from "@/lib/pusher";
 import { canCreateProject, getMaxActiveProjects } from "@/lib/trust-score";
 
 const createProjectSchema = z.object({
@@ -13,6 +14,7 @@ const createProjectSchema = z.object({
   maxMembers: z.number().int().min(2).max(20),
   requiredSkills: z.array(z.string().min(1)).min(1).max(10),
   deadline: z.string().datetime().nullable().optional(),
+  invitedUserIds: z.array(z.string()).optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -139,7 +141,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { requiredSkills, deadline, ...projectData } = parsed.data;
+    const { requiredSkills, deadline, invitedUserIds, ...projectData } = parsed.data;
 
     const project = await prisma.project.create({
       data: {
@@ -166,6 +168,40 @@ export async function POST(req: NextRequest) {
         owner: { select: { id: true, name: true, image: true, trustScore: true, trustLevel: true } },
       },
     });
+
+    // Handle Invitations
+    if (invitedUserIds && invitedUserIds.length > 0) {
+      try {
+        for (const userId of invitedUserIds) {
+          // Create formal Invitation record
+          const invitation = await prisma.invitation.create({
+            data: {
+              projectId: project.id,
+              inviterId: session.user.id,
+              inviteeId: userId,
+              status: "PENDING",
+            },
+          });
+
+          // Create Notification linked to the invitation
+          await prisma.notification.create({
+            data: {
+              userId,
+              title: "📩 Undangan Project",
+              message: `Kamu diundang oleh ${session.user.name} untuk bergabung ke project "${project.title}"`,
+              type: "INVITATION",
+              link: `/project/${project.id}`,
+              invitationId: invitation.id,
+            },
+          });
+
+          // Trigger Pusher for each invited user
+          await pusherServer.trigger(CHANNELS.user(userId), EVENTS.NEW_NOTIFICATION, {});
+        }
+      } catch (invError) {
+        console.error("[projects POST Invitations Error]:", invError);
+      }
+    }
 
     return NextResponse.json(project, { status: 201 });
   } catch (err) {

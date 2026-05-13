@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 interface ProfileEditorProps {
   initialData: {
     name: string;
+    username: string | null;
     bio: string | null;
     image: string | null;
   };
@@ -17,6 +18,7 @@ interface ProfileEditorProps {
 
 export function ProfileEditor({ initialData }: ProfileEditorProps) {
   const [name, setName] = useState(initialData.name);
+  const [username, setUsername] = useState(initialData.username || "");
   const [bio, setBio] = useState(initialData.bio || "");
   const [image, setImage] = useState<string | null>(initialData.image);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +61,7 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
       const res = await fetch("/api/settings/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, bio, image }),
+        body: JSON.stringify({ name, username, bio, image }),
       });
 
       if (!res.ok) throw new Error();
@@ -149,17 +151,39 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
           onChange={(e) => setName(e.target.value)}
           placeholder="Nama kamu..."
           style={{
-            background: "#fff",
-            border: "3px solid #000",
-            borderRadius: "8px",
-            padding: "12px 16px",
-            fontFamily: "Inter, sans-serif",
-            fontSize: "15px",
-            fontWeight: 500,
-            boxShadow: "4px 4px 0px #000",
-            outline: "none"
+            background: "#fff", border: "3px solid #000", borderRadius: "8px", padding: "12px 16px",
+            fontFamily: "Inter, sans-serif", fontSize: "15px", fontWeight: 500, boxShadow: "4px 4px 0px #000", outline: "none"
           }}
         />
+      </div>
+
+      {/* Username Field */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <label style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 800, fontSize: "14px" }}>Username</label>
+          <span style={{ fontSize: "11px", fontWeight: 700, color: "#666" }}>Unique & lowercase only</span>
+        </div>
+        <div style={{ position: "relative" }}>
+          <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontWeight: 800, color: "#000" }}>@</span>
+          <input 
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+            placeholder="username..."
+            style={{
+              width: "100%",
+              background: "#fff",
+              border: "3px solid #000",
+              borderRadius: "8px",
+              padding: "12px 16px 12px 32px",
+              fontFamily: "JetBrains Mono, monospace",
+              fontSize: "15px",
+              fontWeight: 700,
+              boxShadow: "4px 4px 0px #000",
+              outline: "none"
+            }}
+          />
+        </div>
       </div>
 
       {/* Bio Field */}

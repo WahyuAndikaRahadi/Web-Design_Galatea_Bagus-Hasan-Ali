@@ -67,22 +67,20 @@ export async function POST(req: NextRequest, { params }: Params) {
   // Find project members to resolve manual @names
   const projectMembers = await prisma.projectMember.findMany({
     where: { projectId },
-    include: { user: { select: { id: true, name: true } } }
+    include: { user: { select: { id: true, name: true, username: true } } }
   });
 
   const nameMatches = content.match(/@(\w+)/g);
   if (nameMatches) {
     for (const match of nameMatches) {
-      const name = match.slice(1);
-      if (name.toLowerCase() === "all") continue;
-      // Search for any member whose name contains the mention
-      const found = projectMembers.find(m => {
-        const normalizedMemberName = m.user.name.toLowerCase().replace(/\s/g, "");
-        const normalizedMention = name.toLowerCase();
-        return normalizedMemberName.includes(normalizedMention) || normalizedMention.includes(normalizedMemberName);
-      });
+      const username = match.slice(1).toLowerCase();
+      if (username === "all") continue;
+      
+      // Search for any member whose username matches exactly
+      const found = projectMembers.find(m => m.user.username?.toLowerCase() === username);
+      
       if (found && !mentions.includes(found.userId)) {
-        console.log(`[Mention] Manual resolve @${name} -> ${found.user.name} (${found.userId})`);
+        console.log(`[Mention] Resolved @${username} -> ${found.user.name} (${found.userId})`);
         mentions.push(found.userId);
       }
     }

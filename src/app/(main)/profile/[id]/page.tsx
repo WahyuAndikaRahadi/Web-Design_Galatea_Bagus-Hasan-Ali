@@ -10,8 +10,8 @@ import { User } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const user = await prisma.user.findUnique({ where: { id }, select: { name: true } });
-  return { title: user ? `${user.name} | Profil` : "Profil Tidak Ditemukan" };
+  const user = await prisma.user.findUnique({ where: { id }, select: { name: true, username: true } });
+  return { title: user ? `${user.name} (@${user.username}) | Profil` : "Profil Tidak Ditemukan" };
 }
 
 export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -21,7 +21,16 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
   const user = await prisma.user.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      email: true,
+      image: true,
+      bio: true,
+      trustScore: true,
+      trustLevel: true,
+      createdAt: true,
       skills: true,
       endorsementsReceived: true,
       reviewsReceived: true,
@@ -30,7 +39,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
         where: { project: { status: "COMPLETED" } },
         include: { project: { select: { id: true, title: true, category: true } } },
       },
-    },
+    }
   });
 
   if (!user) notFound();
@@ -269,7 +278,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
                     {user.name}
                   </h1>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", opacity: 0.7, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, fontSize: "14px" }}>
-                    <span>@collabolab</span>
+                    <span>@{user.username}</span>
                     <span>•</span>
                     <span>Member since {new Date(user.createdAt).getFullYear()}</span>
                   </div>

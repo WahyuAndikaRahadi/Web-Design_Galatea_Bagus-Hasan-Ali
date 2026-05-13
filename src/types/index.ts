@@ -5,6 +5,7 @@ import "next-auth/jwt";
 declare module "next-auth" {
   interface User {
     id: string;
+    username: string;
     trustScore: number;
     trustLevel: TrustLevel;
     availStatus: AvailStatus;
@@ -16,6 +17,7 @@ declare module "next-auth" {
   interface Session {
     user: User & {
       id: string;
+      username: string;
       trustScore: number;
       trustLevel: TrustLevel;
       availStatus: AvailStatus;
@@ -48,6 +50,7 @@ export type UserSkillData = {
 export type UserPublicProfile = {
   id: string;
   name: string;
+  username: string;
   image: string | null;
   bio: string | null;
   linkedinUrl: string | null;
@@ -78,6 +81,7 @@ export type ProjectMemberData = {
   user: {
     id: string;
     name: string;
+    username: string;
     image: string | null;
     trustScore: number;
     trustLevel: TrustLevel;

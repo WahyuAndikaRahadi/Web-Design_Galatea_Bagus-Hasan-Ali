@@ -15,6 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           select: {
             id: true,
             name: true,
+            username: true,
             image: true,
             trustScore: true,
           },

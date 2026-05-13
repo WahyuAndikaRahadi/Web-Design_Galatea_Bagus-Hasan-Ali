@@ -133,11 +133,11 @@ export function CreatePostBox({ user, onSuccess }: Props) {
     textareaRef.current.focus();
   };
 
-  const handleMentionSelect = (user: { id: string; name: string }) => {
+  const handleMentionSelect = (user: { id: string; name: string; username: string }) => {
     if (cursorPosition === null || !textareaRef.current) return;
     const textBeforeCursor = content.slice(0, cursorPosition);
     const textAfterCursor = content.slice(cursorPosition);
-    const newTextBeforeCursor = textBeforeCursor.replace(/@\w*$/, `@[${user.name}] `);
+    const newTextBeforeCursor = textBeforeCursor.replace(/@\w*$/, `@${user.username} `);
     setContent(newTextBeforeCursor + textAfterCursor);
     setMentionedUsers((prev) => [...prev.filter((u) => u.id !== user.id), { id: user.id, name: user.name }]);
     setShowMentionSuggestions(false);
@@ -147,11 +147,11 @@ export function CreatePostBox({ user, onSuccess }: Props) {
 
   const highlightText = (text: string) => {
     if (!text) return null;
-    const parts = text.split(/(@\[[^\]]+\]|#\w+)/g);
+    // Highlight @username and #tag
+    const parts = text.split(/(@\w+|#\w+)/g);
     return parts.map((part, i) => {
-      if (part.startsWith("@[") && part.endsWith("]")) {
-        const name = part.slice(2, -1);
-        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>@{name}</span>;
+      if (part.startsWith("@")) {
+        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>{part}</span>;
       }
       if (part.startsWith("#")) return <span key={i} style={{ color: "#0047FF", fontWeight: 800 }}>{part}</span>;
       return <span key={i} style={{ color: "#000" }}>{part}</span>;
@@ -275,7 +275,10 @@ export function CreatePostBox({ user, onSuccess }: Props) {
               {showMentionSuggestions && mentionSuggestions.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ position: "absolute", top: "100%", left: "0", marginTop: "12px", width: "260px", maxHeight: "220px", overflowY: "auto", zIndex: 21, padding: "8px", background: "#fff", border: "2px solid #222", boxShadow: "4px 4px 0px #222" }}>
                   {mentionSuggestions.map((user) => (
-                    <button key={user.id} type="button" onMouseDown={() => handleMentionSelect(user)} style={{ width: "100%", padding: "8px", textAlign: "left", background: "transparent", border: "none", cursor: "pointer", fontWeight: 700 }}>@{user.name}</button>
+                    <button key={user.id} type="button" onMouseDown={() => handleMentionSelect(user)} style={{ width: "100%", padding: "8px", textAlign: "left", background: "transparent", border: "none", cursor: "pointer", fontWeight: 700 }}>
+                      <div style={{ fontWeight: 800 }}>@{user.username}</div>
+                      <div style={{ fontSize: "11px", opacity: 0.6 }}>{user.name}</div>
+                    </button>
                   ))}
                 </motion.div>
               )}

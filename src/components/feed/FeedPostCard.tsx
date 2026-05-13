@@ -43,15 +43,13 @@ export function FeedPostCard({ post, currentUserId }: PostCardProps) {
     return "#00D37F"; // Green
   };
 
-  // Renders text with @[Name] mentions (green) and #tags (blue) highlighted
   const renderContent = (text: string) => {
     if (!text) return null;
-    // Split on @[Name] and #word patterns
-    const parts = text.split(/(@\[[^\]]+\]|#\w+)/g);
+    // Split on @username and #tag patterns
+    const parts = text.split(/(@\w+|#\w+)/g);
     return parts.map((part, i) => {
-      if (part.startsWith("@[") && part.endsWith("]")) {
-        const name = part.slice(2, -1);
-        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>@{name}</span>;
+      if (part.startsWith("@")) {
+        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>{part}</span>;
       }
       if (part.startsWith("#")) {
         return <span key={i} style={{ color: "#0047FF", fontWeight: 800 }}>{part}</span>;

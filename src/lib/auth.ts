@@ -71,13 +71,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           // Keep DB sync here for client-side fresh data (Node.js runtime)
           const results = await prisma.$queryRawUnsafe<any[]>(
-            `SELECT id, name, image, role, "trustScore", "trustLevel", "availStatus", "onboardingDone", "isBlocked" FROM "User" WHERE id = $1`,
+            `SELECT id, name, username, image, role, "trustScore", "trustLevel", "availStatus", "onboardingDone", "isBlocked" FROM "User" WHERE id = $1`,
             token.id
           );
           const dbUser = results && results[0];
           if (dbUser) {
             session.user.id = dbUser.id;
             session.user.name = dbUser.name;
+            (session.user as any).username = dbUser.username;
             session.user.image = dbUser.image;
             session.user.role = dbUser.role;
             session.user.trustScore = dbUser.trustScore;

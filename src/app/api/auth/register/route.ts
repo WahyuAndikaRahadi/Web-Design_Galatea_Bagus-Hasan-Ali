@@ -48,10 +48,23 @@ export async function POST(req: NextRequest) {
     const otp = generateOtp();
     const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
+    // Generate unique username
+    let baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '');
+    if (baseUsername.length < 3) baseUsername = baseUsername + "user";
+    let username = baseUsername;
+    let count = 1;
+    while (true) {
+      const existingUsername = await prisma.user.findUnique({ where: { username } });
+      if (!existingUsername) break;
+      username = `${baseUsername}${count}`;
+      count++;
+    }
+
     await prisma.user.create({
       data: {
         name,
         email,
+        username,
         password: hashSync(password, 12),
         otpCode: otp,
         otpExpiry: expiry,

@@ -25,6 +25,7 @@ interface CommentData {
 interface UserSuggestion {
   id: string;
   name: string;
+  username: string;
   trustLevel: string;
 }
 
@@ -99,7 +100,7 @@ export function FeedCommentSection({ postId, currentUserId }: Props) {
 
   const handleMentionSelect = (user: UserSuggestion) => {
     if (cursorPosition === null) return;
-    const before = newComment.slice(0, cursorPosition).replace(/@\w*$/, `@[${user.name}] `);
+    const before = newComment.slice(0, cursorPosition).replace(/@\w*$/, `@${user.username} `);
     const after = newComment.slice(cursorPosition);
     setNewComment(before + after);
     setMentionedUsers((prev) => [...prev.filter((u) => u.id !== user.id), { id: user.id, name: user.name }]);
@@ -149,20 +150,19 @@ export function FeedCommentSection({ postId, currentUserId }: Props) {
   };
 
   const handleReplyClick = (comment: CommentData, rootId: string) => {
-    // When replying to a child, parentId = rootId; auto-prepend @[name]
+    // When replying to a child, parentId = rootId; auto-prepend @username
     setReplyTo({ id: comment.id, name: comment.author.name, rootId });
-    setNewComment(`@[${comment.author.name}] `);
+    setNewComment(`@${(comment.author as any).username || comment.author.name.toLowerCase().replace(/\s+/g, "")} `);
     // Mark the mentioned user
     setMentionedUsers([{ id: comment.authorId, name: comment.author.name }]);
     inputRef.current?.focus();
   };
 
   const renderContent = (text: string) => {
-    const parts = text.split(/(@\[[^\]]+\]|#\w+)/g);
+    const parts = text.split(/(@\w+|#\w+)/g);
     return parts.map((part, i) => {
-      if (part.startsWith("@[") && part.endsWith("]")) {
-        const name = part.slice(2, -1);
-        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>@{name}</span>;
+      if (part.startsWith("@")) {
+        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>{part}</span>;
       }
       if (part.startsWith("#")) return <span key={i} style={{ color: "#0047FF", fontWeight: 800 }}>{part}</span>;
       return part;
@@ -171,11 +171,10 @@ export function FeedCommentSection({ postId, currentUserId }: Props) {
 
   const highlightInput = (text: string) => {
     if (!text) return null;
-    const parts = text.split(/(@\[[^\]]+\]|#\w+)/g);
+    const parts = text.split(/(@\w+|#\w+)/g);
     return parts.map((part, i) => {
-      if (part.startsWith("@[") && part.endsWith("]")) {
-        const name = part.slice(2, -1);
-        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>@{name}</span>;
+      if (part.startsWith("@")) {
+        return <span key={i} style={{ color: "#00D37F", fontWeight: 800 }}>{part}</span>;
       }
       if (part.startsWith("#")) return <span key={i} style={{ color: "#0047FF", fontWeight: 800 }}>{part}</span>;
       return <span key={i} style={{ color: "#000" }}>{part}</span>;
@@ -294,7 +293,8 @@ export function FeedCommentSection({ postId, currentUserId }: Props) {
                       onMouseEnter={(e) => { e.currentTarget.style.background = "#E6F0FF"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; }}
                     >
-                      {u.name}
+                      <div style={{ fontWeight: 800 }}>@{u.username}</div>
+                      <div style={{ fontSize: "11px", opacity: 0.6 }}>{u.name}</div>
                     </button>
                   ))}
                 </motion.div>

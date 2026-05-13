@@ -27,7 +27,7 @@ export default async function CollabHubPage({
     where: { id },
     include: {
       members: {
-        include: { user: { select: { id: true, name: true, image: true, trustScore: true, trustLevel: true } } },
+        include: { user: { select: { id: true, name: true, username: true, image: true, trustScore: true, trustLevel: true } } },
       },
       hubRooms: {
         orderBy: { createdAt: "asc" },

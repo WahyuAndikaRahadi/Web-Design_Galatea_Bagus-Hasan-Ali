@@ -12,6 +12,7 @@ type Notification = {
   type: string;
   link: string | null;
   isRead: boolean;
+  invitationId: string | null;
   createdAt: string;
 };
 
@@ -92,6 +93,34 @@ export function NotificationBell({ userId }: { userId: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ markAll: true }),
     }).catch(() => {});
+  };
+
+  const handleInvitation = async (e: React.MouseEvent, id: string, invitationId: string, action: "ACCEPT" | "DECLINE") => {
+    e.stopPropagation(); // Prevent marking as read and navigating
+    
+    // Optimistic UI update
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+    
+    try {
+      const res = await fetch(`/api/invitations/${invitationId}/respond`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      
+      if (!res.ok) {
+        // Rollback if needed, but for now we just show error
+        console.error("Failed to respond to invitation");
+      } else {
+        // Refresh notifications to reflect state
+        fetchNotifications();
+        if (action === "ACCEPT") {
+          router.refresh();
+        }
+      }
+    } catch (err) {
+      console.error("Invitation response error", err);
+    }
   };
 
   return (
@@ -197,9 +226,49 @@ export function NotificationBell({ userId }: { userId: string }) {
                   <div style={{ fontSize: "12px", color: "#3D3D3D", lineHeight: 1.4, marginBottom: "4px" }}>
                     {n.message}
                   </div>
-                  <div style={{ fontSize: "10px", color: "#999" }}>
+                  <div style={{ fontSize: "10px", color: "#999", marginBottom: n.type === "INVITATION" && !n.isRead ? "12px" : "0" }}>
                     {new Date(n.createdAt).toLocaleDateString("id-ID", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </div>
+
+                  {n.type === "INVITATION" && !n.isRead && n.invitationId && (
+                    <div style={{ display: "flex", gap: "8px", marginTop: "8px" }} onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={(e) => handleInvitation(e, n.id, n.invitationId!, "ACCEPT")}
+                        style={{
+                          flex: 1,
+                          background: "#00D37F",
+                          border: "2px solid #000",
+                          borderRadius: "4px",
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          padding: "6px",
+                          cursor: "pointer",
+                          fontFamily: "Space Grotesk, sans-serif",
+                          boxShadow: "2px 2px 0px #000"
+                        }}
+                      >
+                        Terima
+                      </button>
+                      <button
+                        onClick={(e) => handleInvitation(e, n.id, n.invitationId!, "DECLINE")}
+                        style={{
+                          flex: 1,
+                          background: "#FF4D4D",
+                          border: "2px solid #000",
+                          borderRadius: "4px",
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          padding: "6px",
+                          cursor: "pointer",
+                          color: "#fff",
+                          fontFamily: "Space Grotesk, sans-serif",
+                          boxShadow: "2px 2px 0px #000"
+                        }}
+                      >
+                        Tolak
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}

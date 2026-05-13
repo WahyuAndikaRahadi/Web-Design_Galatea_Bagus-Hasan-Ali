@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/Modal";
 import type { CommitmentLevel } from "@prisma/client";
 import { COMMITMENT_META } from "@/types";
@@ -24,7 +25,9 @@ export function ProjectDetailClient({ projectId, isLoggedIn, isMember, isOwner, 
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [applySuccess, setApplySuccess] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   async function handleApply(e: React.FormEvent) {
     e.preventDefault();
@@ -47,6 +50,25 @@ export function ProjectDetailClient({ projectId, isLoggedIn, isMember, isOwner, 
     }
   }
 
+  async function handleDelete() {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal menghapus project.");
+      }
+      router.push("/explore");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal menghapus.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   if (isMember || isOwner) {
     return (
       <div className="project-detail-action-card" style={{ background: "#fff", border: "3px solid #000", borderRadius: "8px", boxShadow: "6px 6px 0px #000", padding: "24px" }}>
@@ -56,7 +78,41 @@ export function ProjectDetailClient({ projectId, isLoggedIn, isMember, isOwner, 
         <Link href={`/project/${projectId}/hub`} className="btn-primary" id="project-enter-room-btn" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "16px", padding: "14px" }}>
           <img src="/images/logo.png" alt="" style={{ width: "20px", height: "20px", objectFit: "contain" }} /> Masuk Collab Hub
         </Link>
-        {isOwner && <ProjectApplicantsClient projectId={projectId} />}
+        {isOwner && (
+          <>
+            <ProjectApplicantsClient projectId={projectId} />
+            <button 
+              onClick={() => setIsDeleteOpen(true)}
+              className="btn-secondary" 
+              style={{ 
+                width: "100%", 
+                marginTop: "12px", 
+                background: "#FF4D4D", 
+                color: "#fff", 
+                border: "2px solid #000",
+                fontSize: "14px",
+                padding: "10px"
+              }}
+            >
+              🗑️ Hapus Project
+            </button>
+
+            <Modal isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} title="Hapus Project?" size="sm">
+              <div style={{ textAlign: "center", padding: "10px" }}>
+                <p style={{ marginBottom: "20px", fontSize: "15px" }}>
+                  Apakah kamu yakin ingin menghapus project ini? <br/>
+                  <strong>Tindakan ini tidak dapat dibatalkan.</strong>
+                </p>
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <button onClick={() => setIsDeleteOpen(false)} className="btn-secondary" style={{ flex: 1 }}>Batal</button>
+                  <button onClick={handleDelete} className="btn-primary" style={{ flex: 1, background: "#FF4D4D" }} disabled={isLoading}>
+                    {isLoading ? "Menghapus..." : "Ya, Hapus"}
+                  </button>
+                </div>
+              </div>
+            </Modal>
+          </>
+        )}
       </div>
     );
   }
