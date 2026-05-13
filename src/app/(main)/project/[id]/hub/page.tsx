@@ -59,7 +59,7 @@ export default async function CollabHubPage({
   }
 
   // Sanitize: remove passwordHash from client payload
-  const hubRooms = project.hubRooms.map((r) => ({
+  const hubRooms = project.hubRooms.map((r: any) => ({
     id: r.id,
     name: r.name,
     description: r.description,

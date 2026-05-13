@@ -25,27 +25,28 @@ export function Navbar() {
   // Hide navbar on auth pages and admin area
   if (pathname === "/login" || pathname === "/register" || pathname.startsWith("/admin")) return null;
 
-  const navLinks = session?.user 
+  const navLinks = session?.user
     ? [
-        { href: session.user.role === "ADMIN" ? "/admin" : "/dashboard", label: "Dashboard" },
-        { href: "/project/my-projects", label: "My Projects" },
-        { href: "/explore", label: "Explore" },
-        { href: "/feed", label: "Feed" },
-        { href: "/ai-hub", label: "AI Hub" },
-        ...(session.user.role === "ADMIN" ? [{ href: "/admin", label: "🛠️ Admin" }] : []),
-      ]
-    : pathname === "/" 
+      { href: session.user.role === "ADMIN" ? "/admin" : "/dashboard", label: "Dashboard" },
+      { href: "/project/my-projects", label: "My Projects" },
+      { href: "/explore", label: "Explore" },
+      { href: "/feed", label: "Feed" },
+      { href: "/ai-hub", label: "AI Hub" },
+      ...(session.user.role === "ADMIN" ? [{ href: "/admin", label: "🛠️ Admin" }] : []),
+    ]
+    : pathname === "/"
       ? [
-          { href: "#about", label: "About" },
-          { href: "#how-it-works", label: "How It Works" },
-          { href: "#explore-preview", label: "Explore" },
-          { href: "#trust", label: "Trust System" },
-          { href: "#testimonials", label: "Testimonials" },
-        ]
+        { href: "#about", label: "About" },
+        { href: "#stats", label: "Background" },
+        { href: "#how-it-works", label: "How It Works" },
+        { href: "#explore-preview", label: "Explore" },
+        { href: "#trust", label: "Trust System" },
+        { href: "#testimonials", label: "Testimonials" },
+      ]
       : [
-          { href: "/", label: "Home" },
-          { href: "/explore", label: "Explore" },
-        ];
+        { href: "/", label: "Home" },
+        { href: "/explore", label: "Explore" },
+      ];
 
   const filteredLinks = navLinks;
 
@@ -70,7 +71,7 @@ export function Navbar() {
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
-    
+
     sections.forEach(id => {
       const element = document.getElementById(id);
       if (element) observer.observe(element);
@@ -78,12 +79,12 @@ export function Navbar() {
 
     // Hash change listener
     const handleHashChange = () => setActiveHash(window.location.hash);
-    
+
     // Clear active state when at the top (Hero) or bottom (Footer)
     const handleScroll = () => {
       const isAtTop = window.scrollY < 100;
       const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
-      
+
       if (isAtTop || isAtBottom) {
         setActiveHash("");
       }
@@ -91,7 +92,7 @@ export function Navbar() {
 
     window.addEventListener("hashchange", handleHashChange);
     window.addEventListener("scroll", handleScroll);
-    
+
     return () => {
       observer.disconnect();
       window.removeEventListener("hashchange", handleHashChange);
@@ -173,10 +174,10 @@ export function Navbar() {
         {/* Desktop Nav */}
         <nav className={`hidden ${session?.user ? "lg:hidden" : "lg:flex"} items-center gap-2`}>
           {filteredLinks.map((link) => {
-            const isActive = link.href.startsWith("#") 
-              ? activeHash === link.href 
+            const isActive = link.href.startsWith("#")
+              ? activeHash === link.href
               : pathname === link.href;
-            
+
             return (
               <Link
                 key={link.href}
@@ -195,7 +196,7 @@ export function Navbar() {
           {session?.user ? (
             <div className="flex items-center gap-2 lg:gap-3">
               <div className="hidden sm:block">
-                <div 
+                <div
                   title={`Trust Score: ${session.user.trustScore}`}
                   style={{
                     display: "inline-flex",
@@ -210,9 +211,9 @@ export function Navbar() {
                   }}
                 >
                   <span style={{ fontSize: "14px" }}>{getTrustLevelEmoji(session.user.trustLevel)}</span>
-                  <span style={{ 
-                    fontFamily: "Space Grotesk, sans-serif", 
-                    fontWeight: 800, 
+                  <span style={{
+                    fontFamily: "Space Grotesk, sans-serif",
+                    fontWeight: 800,
                     fontSize: "13px",
                     color: "#000"
                   }}>
@@ -247,9 +248,9 @@ export function Navbar() {
                 )}
               </Link>
               <div className="hidden lg:block">
-                <Button 
-                  variant="danger" 
-                  size="sm" 
+                <Button
+                  variant="danger"
+                  size="sm"
                   onClick={() => setShowLogoutModal(true)}
                   style={{ height: "36px", padding: "0 12px" }}
                 >
@@ -310,10 +311,10 @@ export function Navbar() {
           >
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "12px" }}>
               {filteredLinks.map((link) => {
-                const isActive = link.href.startsWith("#") 
-                  ? activeHash === link.href 
+                const isActive = link.href.startsWith("#")
+                  ? activeHash === link.href
                   : pathname === link.href;
-                
+
                 return (
                   <Link
                     key={link.href}

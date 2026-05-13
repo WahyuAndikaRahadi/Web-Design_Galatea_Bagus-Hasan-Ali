@@ -7,6 +7,7 @@ import { ExplorePreview } from "@/components/landing/ExplorePreview";
 import { MarqueeSection } from "@/components/landing/MarqueeSection";
 import { TrustSection } from "@/components/landing/TrustSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { StatsSection } from "@/components/landing/StatsSection";
 import { AboutSection } from "@/components/landing/AboutSection";
 import { CtaFooterSection } from "@/components/landing/CtaFooterSection";
 import { AIAssistantWidget } from "@/components/landing/AIAssistantWidget";
@@ -63,6 +64,7 @@ export default async function HomePage() {
       <main>
         <HeroSection />
         <AboutSection />
+        <StatsSection />
         <WhySection />
         <HowItWorksSection />
         <ExplorePreview 
