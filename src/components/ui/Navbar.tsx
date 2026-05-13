@@ -10,12 +10,14 @@ import { getTrustLevelEmoji, getTrustLevelColor } from "@/lib/trust-score";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useToast } from "@/lib/toast";
 import { Modal } from "@/components/ui/Modal";
-import { User } from "lucide-react";
+import { User, Menu } from "lucide-react";
+import { useUIStore } from "@/store/ui-store";
 
 export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const toast = useToast();
+  const { toggleSidebar } = useUIStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -111,8 +113,9 @@ export function Navbar() {
     >
       <div
         style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
+          width: "100%",
+          maxWidth: session?.user ? "none" : "1200px",
+          margin: session?.user ? "0" : "0 auto",
           padding: "0 24px",
           height: "72px",
           display: "flex",
@@ -120,14 +123,38 @@ export function Navbar() {
           justifyContent: "space-between",
         }}
       >
-        {/* Logo */}
+        {session?.user && (
+          <button
+            onClick={toggleSidebar}
+            className="flex items-center justify-center"
+            style={{
+              background: "#FFE500",
+              border: "2px solid #000",
+              borderRadius: "4px",
+              padding: "6px",
+              marginRight: "16px",
+              cursor: "pointer",
+              boxShadow: "2px 2px 0px #000",
+              transition: "all 0.1s ease",
+              flexShrink: 0,
+            }}
+            onMouseOver={(e) => {
+              (e.currentTarget as any).style.transform = "translate(1px, 1px)";
+              (e.currentTarget as any).style.boxShadow = "1px 1px 0px #000";
+            }}
+            onMouseOut={(e) => {
+              (e.currentTarget as any).style.transform = "translate(0, 0)";
+              (e.currentTarget as any).style.boxShadow = "2px 2px 0px #000";
+            }}
+          >
+            <Menu size={20} color="#000" strokeWidth={3} />
+          </button>
+        )}
         <Link
           href="/"
+          className={`items-center gap-2 ${session?.user ? "hidden" : "flex"}`}
           style={{
             textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
           }}
         >
           <img src="/images/logo.png" alt="Logo" style={{ width: "70px", height: "70px", objectFit: "contain" }} />
@@ -144,7 +171,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-2">
+        <nav className={`hidden ${session?.user ? "lg:hidden" : "lg:flex"} items-center gap-2`}>
           {filteredLinks.map((link) => {
             const isActive = link.href.startsWith("#") 
               ? activeHash === link.href 
@@ -164,7 +191,7 @@ export function Navbar() {
 
         {/* Auth section */}
         {/* Auth section */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
           {session?.user ? (
             <div className="flex items-center gap-2 lg:gap-3">
               <div className="hidden sm:block">
@@ -241,32 +268,34 @@ export function Navbar() {
             </div>
           )}
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            id="navbar-menu-btn"
-            className="lg:hidden"
-            style={{
-              background: menuOpen ? "#FFE500" : "transparent",
-              border: "2px solid #000",
-              borderRadius: "4px",
-              padding: "6px 10px",
-              cursor: "pointer",
-              fontWeight: 900,
-              fontSize: "18px",
-              transition: "all 0.15s ease",
-              boxShadow: menuOpen ? "2px 2px 0px #000" : "none",
-            }}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
+          {/* Mobile hamburger - Only for guest */}
+          {!session?.user && (
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              id="navbar-menu-btn"
+              className="lg:hidden"
+              style={{
+                background: menuOpen ? "#FFE500" : "transparent",
+                border: "2px solid #000",
+                borderRadius: "4px",
+                padding: "6px 10px",
+                cursor: "pointer",
+                fontWeight: 900,
+                fontSize: "18px",
+                transition: "all 0.15s ease",
+                boxShadow: menuOpen ? "2px 2px 0px #000" : "none",
+              }}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - Only for guest */}
       <AnimatePresence>
-        {menuOpen && (
+        {!session?.user && menuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
@@ -298,29 +327,14 @@ export function Navbar() {
                 );
               })}
               
-              {!session?.user ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px", paddingTop: "12px", borderTop: "2px solid #000" }}>
-                  <LinkButton href="/login" variant="secondary" fullWidth onClick={() => setMenuOpen(false)}>
-                    Masuk
-                  </LinkButton>
-                  <LinkButton href="/register" variant="primary" fullWidth onClick={() => setMenuOpen(false)}>
-                    Daftar Gratis
-                  </LinkButton>
-                </div>
-              ) : (
-                <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "2px solid #000" }}>
-                  <Button
-                    variant="danger"
-                    fullWidth
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setShowLogoutModal(true);
-                    }}
-                  >
-                    Keluar Akun
-                  </Button>
-                </div>
-              )}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px", paddingTop: "12px", borderTop: "2px solid #000" }}>
+                <LinkButton href="/login" variant="secondary" fullWidth onClick={() => setMenuOpen(false)}>
+                  Masuk
+                </LinkButton>
+                <LinkButton href="/register" variant="primary" fullWidth onClick={() => setMenuOpen(false)}>
+                  Daftar Gratis
+                </LinkButton>
+              </div>
             </div>
           </motion.div>
         )}
