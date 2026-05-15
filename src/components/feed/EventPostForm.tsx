@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
+import { useToast } from "@/lib/toast";
 
 interface Props {
   isOpen: boolean;
