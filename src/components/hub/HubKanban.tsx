@@ -363,7 +363,7 @@ export function HubKanban({ projectId, roomId, members, currentUserId, isGlobal 
            isOpen={createModal.isOpen} 
            onClose={() => setCreateModal({ ...createModal, isOpen: false })}
            status={createModal.status}
-           members={members as any}
+           members={members}
            onCreated={(t) => setTasks([...tasks, t])}
            projectId={projectId}
            roomId={roomId}
@@ -376,7 +376,7 @@ export function HubKanban({ projectId, roomId, members, currentUserId, isGlobal 
            isOpen={!!detailTask}
            onClose={() => setDetailTask(null)}
            task={detailTask}
-           members={members as any}
+           members={members}
            currentUserId={currentUserId}
            projectId={projectId}
            canAssign={canAssign}

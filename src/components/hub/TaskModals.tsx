@@ -12,6 +12,8 @@ type HubTask = {
   assigneeId: string | null;
   labelTag: string | null;
   deadline: string | null;
+  position: number;
+  isGlobal: boolean;
 };
 
 type Member = {
