@@ -1,10 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
+import CountUp from "./CountUp";
 
 const steps = [
   {
-    number: "01",
+    number: 1,
     title: "Buat profil & pilih skill",
     description:
       "Daftar 30 detik. Pilih skill tags kamu — Riset, Penulisan, Akuntansi, atau apapun yang kamu jago. Trust Score dimulai.",
@@ -13,7 +14,7 @@ const steps = [
     id: "step-create-profile",
   },
   {
-    number: "02",
+    number: 2,
     title: "Temukan project yang cocok",
     description:
       "Explore feed project dengan Skill Match Indicator. Lihat berapa persen skillmu cocok dengan project yang ada.",
@@ -22,7 +23,7 @@ const steps = [
     id: "step-find-project",
   },
   {
-    number: "03",
+    number: 3,
     title: "Kolaborasi di Collab Hub",
     description:
       "Chat real-time, kanban board, dan presence indicator — semua dalam satu room. Mulai bangun sesuatu yang keren.",
@@ -209,7 +210,7 @@ export function HowItWorksSection() {
             <div key={i} style={{ width: "4px", height: "4px", background: "#000", borderRadius: "50%" }} />
           ))}
         </div>
-        
+
         <div style={{ position: "absolute", bottom: "15%", left: "20%", display: "grid", gridTemplateColumns: "repeat(6, 6px)", gap: "5px", opacity: 0.08 }}>
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} style={{ width: "3px", height: "3px", background: "#000", borderRadius: "50%" }} />
@@ -224,16 +225,16 @@ export function HowItWorksSection() {
 
         {/* NEW: Overlapping Coral Squares bottom-right */}
         <div style={{ position: "absolute", bottom: "5%", right: "15%", opacity: 0.2 }}>
-           <motion.div
-             animate={{ rotate: [0, 10, 0] }}
-             transition={{ duration: 5, repeat: Infinity }}
-             style={{ width: "80px", height: "80px", background: "#FF4D4D", border: "3px solid #000" }}
-           />
-           <motion.div
-             animate={{ rotate: [10, 0, 10] }}
-             transition={{ duration: 5, repeat: Infinity }}
-             style={{ width: "80px", height: "80px", border: "3px solid #000", position: "absolute", top: "10px", left: "10px" }}
-           />
+          <motion.div
+            animate={{ rotate: [0, 10, 0] }}
+            transition={{ duration: 5, repeat: Infinity }}
+            style={{ width: "80px", height: "80px", background: "#FF4D4D", border: "3px solid #000" }}
+          />
+          <motion.div
+            animate={{ rotate: [10, 0, 10] }}
+            transition={{ duration: 5, repeat: Infinity }}
+            style={{ width: "80px", height: "80px", border: "3px solid #000", position: "absolute", top: "10px", left: "10px" }}
+          />
         </div>
 
 
@@ -283,18 +284,18 @@ export function HowItWorksSection() {
           }}
         >
           {/* Vertical Dashed Line center (Starting from first card) */}
-          <div 
-            style={{ 
-              position: "absolute", 
-              top: "0", 
-              left: "50%", 
-              width: "2px", 
-              height: "100%", 
-              borderLeft: "4px dashed #000", 
+          <div
+            style={{
+              position: "absolute",
+              top: "0",
+              left: "50%",
+              width: "2px",
+              height: "100%",
+              borderLeft: "4px dashed #000",
               opacity: 0.08,
               transform: "translateX(-50%)",
               zIndex: 0
-            }} 
+            }}
           />
           {steps.map((step, index) => (
             <motion.div
@@ -341,7 +342,16 @@ export function HowItWorksSection() {
                     zIndex: -1,
                   }}
                 >
-                  {step.number}
+                  0<CountUp
+                    from={0}
+                    to={step.number}
+                    separator=","
+                    direction="up"
+                    duration={1}
+                    className="count-up-text"
+                    delay={0}
+                  />
+
                 </div>
 
                 <div

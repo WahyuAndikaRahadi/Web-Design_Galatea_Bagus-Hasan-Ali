@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import { TiltWrapper } from "./TiltWrapper";
+import CountUp from "./CountUp";
 
 export function StatsSection() {
   const stats = [
     {
-      value: "68%",
+      value: 68,
       label: "Feedback Mingguan",
       desc: "Gen-Z menginginkan umpan balik setidaknya sekali seminggu (Officevibe, 2024).",
       color: "#FFE500",
@@ -14,8 +15,8 @@ export function StatsSection() {
       icon: "💬",
     },
     {
-      value: "72%",
-      label: "Transparansi Tujuan",
+      value: 72,
+      label: "Transparansi",
       desc: "Ingin melihat bagaimana peran mereka berkontribusi pada visi besar (Betterworks, 2024).",
       color: "#0047FF",
       textColor: "#fff",
@@ -23,7 +24,7 @@ export function StatsSection() {
       icon: "🎯",
     },
     {
-      value: "81%",
+      value: 81,
       label: "Akses Real-Time",
       desc: "Mengharapkan dashboard real-time dan akses mobile (PwC, 2024).",
       color: "#00D37F",
@@ -31,7 +32,7 @@ export function StatsSection() {
       icon: "📱",
     },
     {
-      value: "83%",
+      value: 83,
       label: "Kesehatan Mental",
       desc: "Menginginkan metrik burnout & work-life balance dipertimbangkan (APA, 2024).",
       color: "#FF4D4D",
@@ -44,28 +45,28 @@ export function StatsSection() {
   const impacts = [
     {
       title: "Reduksi Turnover",
-      value: "30%",
+      value: 30,
       desc: "Pengurangan perputaran karyawan dengan model check-in berkelanjutan.",
       icon: "📉",
       bg: "#FFFFFF",
     },
     {
       title: "Keterlibatan Tim",
-      value: "51%",
+      value: 51,
       desc: "Engagement lebih tinggi melalui sistem target OKR yang transparan.",
       icon: "🤝",
       bg: "#FFE500",
     },
     {
       title: "Partisipasi Aktif",
-      value: "65%",
+      value: 65,
       desc: "Peningkatan partisipasi berkat sistem pengakuan rekan sejawat.",
       icon: "✨",
       bg: "#00D37F",
     },
     {
       title: "Motivasi Belajar",
-      value: "94%",
+      value: 94,
       desc: "Preferensi terhadap micro-learning untuk pengembangan skill instan.",
       icon: "🚀",
       bg: "#0047FF",
@@ -100,7 +101,7 @@ export function StatsSection() {
       {/* Dynamic Background Elements - Fun & Alive */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
         {/* Geometric Decorations (Consistency with AboutSection) */}
-        
+
         {/* Yellow Circle top-right */}
         <motion.div
           animate={{ scale: [1, 1.1, 1], y: [0, 15, 0] }}
@@ -150,11 +151,11 @@ export function StatsSection() {
           }}
         >
           <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", overflow: "visible" }}>
-            <path 
-              d="M50 5 L95 85 L5 85 Z" 
-              fill="#00D37F" 
-              stroke="#000" 
-              strokeWidth="6" 
+            <path
+              d="M50 5 L95 85 L5 85 Z"
+              fill="#00D37F"
+              stroke="#000"
+              strokeWidth="6"
               style={{ filter: "drop-shadow(4px 4px 0px #000)" }}
             />
           </svg>
@@ -195,15 +196,15 @@ export function StatsSection() {
         </div>
 
         {/* Giant Background Text */}
-        <div style={{ 
-          position: "absolute", 
-          top: "40%", 
-          left: "50%", 
-          transform: "translate(-50%, -50%)", 
-          fontSize: "clamp(100px, 15vw, 180px)", 
-          fontWeight: 900, 
-          color: "#000", 
-          opacity: 0.012, 
+        <div style={{
+          position: "absolute",
+          top: "40%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: "clamp(100px, 15vw, 180px)",
+          fontWeight: 900,
+          color: "#000",
+          opacity: 0.012,
           whiteSpace: "nowrap",
           pointerEvents: "none",
           zIndex: -1
@@ -287,9 +288,17 @@ export function StatsSection() {
                 <div style={{ position: "absolute", top: "15px", right: "15px", fontSize: "28px", opacity: 0.25 }}>
                   {stat.icon}
                 </div>
-                
+
                 <div style={{ fontSize: "52px", fontWeight: 900, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1, letterSpacing: "-0.04em" }}>
-                  {stat.value}
+                  <CountUp
+                    from={0}
+                    to={stat.value}
+                    separator=","
+                    direction="up"
+                    duration={2}
+                    className="count-up-text"
+                    delay={0}
+                  />%
                 </div>
                 <div style={{ fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px" }}>
                   {stat.label}
@@ -297,7 +306,7 @@ export function StatsSection() {
                 <p style={{ fontSize: "14px", lineHeight: 1.5, fontWeight: 500 }}>
                   {stat.desc}
                 </p>
-                
+
                 <div style={{ position: "absolute", bottom: "-10px", right: "-10px", width: "30px", height: "30px", background: "rgba(0,0,0,0.05)", borderRadius: "50%" }}></div>
               </motion.div>
             </TiltWrapper>
@@ -365,7 +374,15 @@ export function StatsSection() {
                 >
                   <div style={{ fontSize: "36px" }}>{impact.icon}</div>
                   <div style={{ fontSize: "48px", fontWeight: 900, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1 }}>
-                    {impact.value}
+                    <CountUp
+                    from={0}
+                    to={impact.value}
+                    separator=","
+                    direction="up"
+                    duration={2}
+                    className="count-up-text"
+                    delay={0}
+                  />%
                   </div>
                   <div style={{ fontWeight: 800, fontSize: "16px", textTransform: "uppercase" }}>{impact.title}</div>
                   <p style={{ fontSize: "14px", opacity: 0.8, lineHeight: 1.4, fontWeight: 500 }}>

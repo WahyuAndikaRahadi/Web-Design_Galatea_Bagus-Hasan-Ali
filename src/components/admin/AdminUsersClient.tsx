@@ -17,6 +17,8 @@ type User = {
 export function AdminUsersClient() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -40,19 +42,25 @@ export function AdminUsersClient() {
     }
   }
 
-  async function updateStatus(userId: string, isBlocked: boolean) {
+  async function executeDelete() {
+    if (!isConfirmingDelete) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, isBlocked })
+      const res = await fetch(`/api/admin/users?userId=${isConfirmingDelete}`, {
+        method: 'DELETE',
       });
       if (res.ok) {
-        toast.success("Success", `User berhasil di ${isBlocked ? 'blokir' : 'aktifkan'}`);
+        toast.success("Success", "User beserta aktivitasnya berhasil dihapus");
         fetchUsers();
+      } else {
+        const data = await res.json();
+        toast.error("Error", data.error || "Gagal menghapus user");
       }
     } catch (err) {
-      toast.error("Error", "Gagal update status user");
+      toast.error("Error", "Gagal menghapus user");
+    } finally {
+      setIsDeleting(false);
+      setIsConfirmingDelete(null);
     }
   }
 
@@ -94,7 +102,6 @@ export function AdminUsersClient() {
             <tr style={{ background: "#000", borderBottom: "3px solid #000", color: "#FFE500", fontFamily: "Space Grotesk, sans-serif", fontWeight: 900, textTransform: "uppercase", fontSize: "12px", letterSpacing: "1px" }}>
               <th style={{ padding: "20px" }}>Identification</th>
               <th style={{ padding: "20px" }}>Trust Parameters</th>
-              <th style={{ padding: "20px" }}>System Status</th>
               <th style={{ padding: "20px" }}>Access Level</th>
               <th style={{ padding: "20px" }}>Directives</th>
             </tr>
@@ -141,21 +148,6 @@ export function AdminUsersClient() {
                   </div>
                 </td>
                 <td style={{ padding: "20px" }}>
-                  <span style={{ 
-                    padding: "4px 12px", 
-                    borderRadius: "2px", 
-                    border: "2px solid #000",
-                    background: user.isBlocked ? "#FF4D4D" : "#00D37F",
-                    color: user.isBlocked ? "#fff" : "#000",
-                    fontSize: "11px",
-                    fontWeight: 900,
-                    letterSpacing: "0.5px",
-                    boxShadow: "2px 2px 0px #000"
-                  }}>
-                    {user.isBlocked ? "BLOCKED" : "OPERATIONAL"}
-                  </span>
-                </td>
-                <td style={{ padding: "20px" }}>
                    <div style={{ 
                      display: "inline-block",
                      padding: "4px 10px",
@@ -172,11 +164,11 @@ export function AdminUsersClient() {
                 </td>
                 <td style={{ padding: "20px" }}>
                   <button
-                    onClick={() => updateStatus(user.id, !user.isBlocked)}
+                    onClick={() => setIsConfirmingDelete(user.id)}
                     style={{
                       padding: "8px 16px",
-                      background: user.isBlocked ? "#00D37F" : "#FF4D4D",
-                      color: user.isBlocked ? "#000" : "#fff",
+                      background: "#FF4D4D",
+                      color: "#fff",
                       border: "2px solid #000",
                       borderRadius: "4px",
                       fontWeight: 900,
@@ -195,7 +187,7 @@ export function AdminUsersClient() {
                       (e.currentTarget as any).style.boxShadow = "4px 4px 0px #000";
                     }}
                   >
-                    {user.isBlocked ? "Activate" : "Terminate"}
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -203,6 +195,102 @@ export function AdminUsersClient() {
           </tbody>
         </table>
       </div>
+      {/* Custom Confirm Modal */}
+      {isConfirmingDelete && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backdropFilter: "blur(2px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          padding: "20px"
+        }}>
+          <div style={{
+            background: "#FFFFFF",
+            border: "3px solid #000",
+            borderRadius: "8px",
+            boxShadow: "8px 8px 0px #000",
+            padding: "32px",
+            maxWidth: "400px",
+            width: "100%",
+            color: "#000",
+            fontFamily: "Space Grotesk, sans-serif"
+          }}>
+            <h3 style={{ fontSize: "24px", fontWeight: 900, marginBottom: "16px", lineHeight: 1.2 }}>
+              Peringatan Destruktif!
+            </h3>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "14px", fontWeight: 500, marginBottom: "24px", lineHeight: 1.5, color: "#3D3D3D" }}>
+              Yakin ingin menghapus user ini beserta <strong>seluruh aktivitasnya</strong> (Project, Post, Laporan, dll)? Tindakan ini permanen dan tidak dapat dibatalkan.
+            </p>
+            
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setIsConfirmingDelete(null)}
+                disabled={isDeleting}
+                style={{
+                  padding: "10px 20px",
+                  background: "#fff",
+                  color: "#000",
+                  border: "2px solid #000",
+                  borderRadius: "4px",
+                  fontWeight: 800,
+                  fontSize: "14px",
+                  cursor: isDeleting ? "not-allowed" : "pointer",
+                  transition: "all 0.1s ease",
+                  boxShadow: "3px 3px 0px #000"
+                }}
+                onMouseDown={(e) => {
+                  if (isDeleting) return;
+                  (e.currentTarget as any).style.transform = "translate(2px, 2px)";
+                  (e.currentTarget as any).style.boxShadow = "1px 1px 0px #000";
+                }}
+                onMouseUp={(e) => {
+                  if (isDeleting) return;
+                  (e.currentTarget as any).style.transform = "none";
+                  (e.currentTarget as any).style.boxShadow = "3px 3px 0px #000";
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={executeDelete}
+                disabled={isDeleting}
+                style={{
+                  padding: "10px 20px",
+                  background: "#FF4D4D",
+                  color: "#fff",
+                  border: "2px solid #000",
+                  borderRadius: "4px",
+                  fontWeight: 800,
+                  fontSize: "14px",
+                  cursor: isDeleting ? "not-allowed" : "pointer",
+                  transition: "all 0.1s ease",
+                  boxShadow: "3px 3px 0px #000",
+                  opacity: isDeleting ? 0.7 : 1
+                }}
+                onMouseDown={(e) => {
+                  if (isDeleting) return;
+                  (e.currentTarget as any).style.transform = "translate(2px, 2px)";
+                  (e.currentTarget as any).style.boxShadow = "1px 1px 0px #000";
+                }}
+                onMouseUp={(e) => {
+                  if (isDeleting) return;
+                  (e.currentTarget as any).style.transform = "none";
+                  (e.currentTarget as any).style.boxShadow = "3px 3px 0px #000";
+                }}
+              >
+                {isDeleting ? "Menghapus..." : "Ya, Hapus!"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
