@@ -1,58 +1,61 @@
 "use client";
 
 import { motion } from "framer-motion";
+import CountUp from "./CountUp";
 
 export function StatsBackgroundSection() {
   const stats = [
     {
-      value: "68%",
-      label: "Inginkan Feedback Mingguan",
+      value: 68,
+      label: "Feedback Mingguan",
       source: "Officevibe, 2024",
       color: "#FFE500", // Yellow
-      desc: "Gen-Z tidak menunggu evaluasi tahunan; mereka butuh validasi instan untuk berkembang."
+      desc: "Gen-Z menginginkan umpan balik setidaknya sekali seminggu."
     },
     {
-      value: "72%",
-      label: "Transparansi Goal (OKR)",
+      value: 72,
+      label: "Transparansi Tujuan",
       source: "Betterworks, 2024",
       color: "#00D37F", // Green
-      desc: "Mereka ingin melihat bagaimana kontribusi mereka terhubung langsung dengan visi besar."
+      desc: "Ingin melihat bagaimana peran mereka berkontribusi pada visi besar."
     },
     {
-      value: "81%",
-      label: "Ekspektasi Dashboard Real-time",
+      value: 81,
+      label: "Akses Real-Time",
       source: "PwC, 2024",
       color: "#0047FF", // Blue
       textColor: "#FFFFFF",
-      desc: "Digital natives menghindari sistem kuno; mereka butuh data performa yang bisa diakses 24/7."
+      desc: "Mengharapkan dashboard real-time dan akses mobile."
     },
     {
-      value: "83%",
-      label: "Metrik Kesejahteraan Mental",
-      source: "APA, 2024",
+      value: 83,
+      label: "Kesehatan Mental",
+      source: "Survei internal, 2024",
       color: "#FF4D4D", // Coral
-      desc: "Bukan hanya output, mereka ingin kesehatan mental & work-life balance masuk dalam hitungan."
+      desc: "Menginginkan metrik burnout & work-life balance dipertimbangkan."
     }
   ];
 
   const impacts = [
     {
-      label: "Turnover Karyawan",
-      change: "-30%",
-      detail: "Hasil transisi Adobe ke sistem feedback berkelanjutan.",
-      source: "Adobe Case Study"
+      label: "Reduksi Turnover",
+      change: 30,
+      detail: "Pengurangan perputaran karyawan dengan model check-in berkelanjutan."
     },
     {
-      label: "Partisipasi Komunitas",
-      change: "+65%",
-      detail: "Melalui implementasi sistem peer-recognition yang tepat.",
-      source: "TalentLMS"
+      label: "Keterlibatan Tim",
+      change: 51,
+      detail: "Engagement lebih tinggi melalui sistem target OKR yang transparan."
     },
     {
-      label: "User Engagement",
-      change: "+51%",
-      detail: "Rata-rata kenaikan keterlibatan dengan transparansi OKR.",
-      source: "Betterworks"
+      label: "Partisipasi Aktif",
+      change: 65,
+      detail: "Peningkatan partisipasi berkat sistem pengakuan rekan sejawat."
+    },
+    {
+      label: "Motivasi Belajar",
+      change: 94,
+      detail: "Preferensi terhadap micro-learning untuk pengembangan skill instan."
     }
   ];
 
@@ -170,7 +173,9 @@ export function StatsBackgroundSection() {
                 transition: "all 0.15s ease"
               }}
             >
-              <div style={{ fontSize: "42px", fontWeight: 900, marginBottom: "8px" }}>{stat.value}</div>
+              <div style={{ fontSize: "42px", fontWeight: 900, marginBottom: "8px" }}>
+                <CountUp from={0} to={stat.value} duration={3} />%
+              </div>
               <div style={{ fontSize: "18px", fontWeight: 800, marginBottom: "12px", lineHeight: 1.2 }}>{stat.label}</div>
               <p style={{ fontSize: "14px", opacity: 0.9, lineHeight: 1.5, marginBottom: "16px", flexGrow: 1 }}>{stat.desc}</p>
               <div style={{ 
@@ -211,7 +216,9 @@ export function StatsBackgroundSection() {
           }}>
             {impacts.map((impact, i) => (
               <div key={i} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "48px", fontWeight: 900, color: "#FFE500", marginBottom: "8px" }}>{impact.change}</div>
+                <div style={{ fontSize: "48px", fontWeight: 900, color: "#FFE500", marginBottom: "8px" }}>
+                  <CountUp from={0} to={impact.change} duration={2} />%
+                </div>
                 <div style={{ fontSize: "16px", fontWeight: 800, marginBottom: "8px" }}>{impact.label}</div>
                 <p style={{ fontSize: "13px", color: "#AAA", lineHeight: 1.4 }}>{impact.detail}</p>
               </div>
