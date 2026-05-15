@@ -107,7 +107,7 @@ export const containerVariants = {
       staggerChildren: 0.1,
     },
   },
-};
+} as const;
 
 export const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -120,7 +120,7 @@ export const itemVariants = {
       damping: 15,
     },
   },
-};
+} as const;
 
 export function SectionLabel({ children }: { children: React.ReactNode }) {
     return (

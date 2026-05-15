@@ -52,7 +52,7 @@ export function Sidebar() {
       x: isSidebarCollapsed ? "-100%" : 0,
       transition: { duration: 0.3, ease: "circOut" }
     }
-  };
+  } as const;
 
   return (
     <>
