@@ -16,7 +16,6 @@ interface Project {
   category: string;
   skills: string[];
   commitmentLevel: string;
-  sdgTag: string;
 }
 
 export async function getProjectRecommendations(userContext: UserContext, openProjects: Project[]) {

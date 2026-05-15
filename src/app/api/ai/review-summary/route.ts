@@ -38,7 +38,7 @@ export async function POST() {
       projectCategory: r.project.category,
       rating: r.rating,
       behaviorTags: r.behaviorTags,
-      note: r.note
+      note: r.comment
     }));
 
     const result = await summarizeReviews(user.name || "User", "BUILDER", reviews);

@@ -243,6 +243,7 @@ model Project {
   bans            ProjectBan[]
   internalReports ProjectReport[]
   invitations     Invitation[]
+  reviews         PeerReview[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -377,6 +378,7 @@ model PeerReview {
 
   reviewer     User     @relation("reviewer", fields: [reviewerId], references: [id])
   reviewed     User     @relation("reviewed", fields: [reviewedId], references: [id])
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   createdAt    DateTime @default(now())
 
