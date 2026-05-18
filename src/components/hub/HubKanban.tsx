@@ -33,6 +33,8 @@ type HubTask = {
   deadline: string | null;
   position: number;
   isGlobal: boolean;
+  isApproved: boolean;
+  revisionNote: string | null;
 };
 
 type Member = {
@@ -226,6 +228,16 @@ export function HubKanban({ projectId, roomId, members, currentUserId, isGlobal 
           ) : (
             <span style={{ background: "#F5F0E8", border: "1.5px solid #000000", borderRadius: "4px", fontSize: "11px", fontWeight: 800, padding: "1px 6px", color: "#666", fontFamily: "Space Grotesk, sans-serif", borderStyle: "dashed" }}>
               Unassigned
+            </span>
+          )}
+          {task.isApproved && (
+            <span style={{ background: "#00D37F", border: "1.5px solid #000", borderRadius: "4px", fontSize: "10px", fontWeight: 900, padding: "1px 6px", color: "#000" }}>
+              ✅ APPROVED
+            </span>
+          )}
+          {task.status === "DONE" && !task.isApproved && (
+            <span style={{ background: "#FFE500", border: "1.5px solid #000", borderRadius: "4px", fontSize: "10px", fontWeight: 900, padding: "1px 6px", color: "#000" }}>
+              ⏳ Menunggu Review
             </span>
           )}
         </div>
