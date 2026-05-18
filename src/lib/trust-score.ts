@@ -87,13 +87,9 @@ export function refreshUserTrustScore(user: any): { score: number, level: TrustL
     score += TRUST_SCORE_DELTAS.STUDENT_VERIFIED;
   }
 
-  // 4. Completed Projects (+15 each)
-  // This logic depends on how you pass the data. 
-  // For now, let's assume we pass the counts.
-  if (user._count?.projectsOwned) {
-     // This part is tricky without a full query.
-     // In a real app, you'd fetch these counts.
-  }
+  // 4. Tambahkan Event Score (Poin dinamis dari database seperti Project Completed, Kicked, dll)
+  const dynamicEventScore = user.eventScore || 0;
+  score += dynamicEventScore;
 
   // Final Level
   const level = calculateTrustLevel(score);

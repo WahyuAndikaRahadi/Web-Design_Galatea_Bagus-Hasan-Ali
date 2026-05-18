@@ -129,6 +129,7 @@ model User {
   portfolioUrl      String?
   githubUrl         String?
   trustScore        Int       @default(20)
+  eventScore        Int       @default(0)
   trustLevel        TrustLevel @default(NEWCOMER)
   availStatus       AvailStatus @default(OPEN)
   isStudentVerified Boolean   @default(false)
@@ -228,6 +229,8 @@ model Project {
   status          ProjectStatus @default(OPEN)
   ownerId         String
   deadline        DateTime?
+  isTrustScoreAwarded Boolean @default(false)
+
 
   owner           User     @relation("owner", fields: [ownerId], references: [id])
   requiredSkills  ProjectSkill[]
@@ -315,6 +318,8 @@ model Task {
   labelTag    String?
   deadline    DateTime?
   position    Int        @default(0)
+  isApproved  Boolean    @default(false)
+  revisionNote String?
 
   project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -455,6 +460,8 @@ model HubTask {
   deadline    DateTime?
   position    Int        @default(0)
   isGlobal    Boolean    @default(false)
+  isApproved  Boolean    @default(false)
+  revisionNote String?
 
   room        HubRoom?   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)

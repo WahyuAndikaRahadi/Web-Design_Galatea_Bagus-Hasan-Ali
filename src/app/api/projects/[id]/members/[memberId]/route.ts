@@ -104,7 +104,10 @@ export async function DELETE(req: NextRequest, { params }: Params) {
         }),
         prisma.user.update({
           where: { id: targetMember.userId },
-          data: { trustScore: { decrement: 8 } },
+          data: { 
+            trustScore: { decrement: 8 },
+            eventScore: { decrement: 8 }
+          },
         }),
         prisma.notification.create({
           data: {

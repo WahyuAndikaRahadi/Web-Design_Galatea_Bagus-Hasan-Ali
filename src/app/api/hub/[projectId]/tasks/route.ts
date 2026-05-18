@@ -151,6 +151,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   const existingTask = await prisma.hubTask.findUnique({ where: { id } });
   if (!existingTask) return NextResponse.json({ error: "Task not found" }, { status: 404 });
+  if (existingTask.isApproved) return NextResponse.json({ error: "Task ini sudah di-approve dan tidak bisa diubah lagi." }, { status: 403 });
 
   // Status change validation
   if (updates.status !== undefined && updates.status !== existingTask.status) {

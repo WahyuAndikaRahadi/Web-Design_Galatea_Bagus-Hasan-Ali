@@ -14,6 +14,8 @@ type HubTask = {
   deadline: string | null;
   position: number;
   isGlobal: boolean;
+  isApproved: boolean;
+  revisionNote: string | null;
 };
 
 type Member = {
@@ -144,9 +146,40 @@ interface DetailProps {
 export function TaskDetailModal({ isOpen, onClose, task, members, currentUserId, projectId, canAssign, onUpdate }: DetailProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isRevising, setIsRevising] = useState(false);
+  const [revisionNote, setRevisionNote] = useState("");
 
   const isAssignedToMe = task.assigneeId === currentUserId;
   const isUnassigned = !task.assigneeId;
+
+  async function handleReview(action: "APPROVE" | "REVISE") {
+    if (action === "REVISE" && !revisionNote.trim()) {
+      setError("Catatan revisi wajib diisi.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/hub/${projectId}/tasks/${task.id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, note: action === "REVISE" ? revisionNote : undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      onUpdate(data);
+      if (action === "APPROVE") {
+        onClose(); // Auto close on approve
+      } else {
+        setIsRevising(false);
+        setRevisionNote("");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal memproses review");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function handleClaim() {
     setLoading(true);
@@ -210,10 +243,20 @@ export function TaskDetailModal({ isOpen, onClose, task, members, currentUserId,
         {error && <div style={{ color: "#FF4D4D", fontWeight: 700, fontSize: "14px" }}>⚠️ {error}</div>}
 
         <div>
-          <h3 style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 900, fontSize: "20px", marginBottom: "8px" }}>{task.title}</h3>
+          <h3 style={{ fontFamily: "Space Grotesk, sans-serif", fontWeight: 900, fontSize: "20px", marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
+            {task.title}
+            {task.isApproved && <span style={{ background: "#00D37F", padding: "2px 8px", borderRadius: "4px", fontSize: "12px", border: "1.5px solid #000" }}>✅ Approved</span>}
+          </h3>
           <p style={{ color: "#3D3D3D", fontSize: "15px", whiteSpace: "pre-wrap", background: "#F5F0E8", padding: "12px", border: "2px solid #000", borderRadius: "6px" }}>
             {task.description || "Tidak ada deskripsi."}
           </p>
+
+          {task.revisionNote && (
+            <div style={{ marginTop: "12px", background: "#FFF0F0", border: "2px solid #FF4D4D", padding: "12px", borderRadius: "6px" }}>
+              <div style={{ fontWeight: 800, color: "#FF4D4D", fontSize: "12px", marginBottom: "4px" }}>⚠️ CATATAN REVISI DARI ADMIN:</div>
+              <div style={{ fontSize: "14px", color: "#000" }}>{task.revisionNote}</div>
+            </div>
+          )}
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #000", paddingTop: "16px" }}>
@@ -225,15 +268,15 @@ export function TaskDetailModal({ isOpen, onClose, task, members, currentUserId,
           </div>
           
           <div style={{ display: "flex", gap: "8px" }}>
-            {isUnassigned ? (
+            {!task.isApproved && isUnassigned ? (
               <button onClick={handleClaim} className="btn-primary btn-sm" disabled={loading}>🙋 Klaim Task</button>
-            ) : isAssignedToMe ? (
+            ) : !task.isApproved && isAssignedToMe ? (
               <button onClick={handleUnclaim} className="btn-secondary btn-sm" style={{borderColor:'#FF4D4D', color:'#FF4D4D'}} disabled={loading}>Melepas Task</button>
             ) : null}
           </div>
         </div>
 
-        {canAssign && (
+        {canAssign && !task.isApproved && (
             <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#3D3D3D", marginBottom: "6px" }}>GANTI PENANGGUNG JAWAB</label>
                 <select 
@@ -249,6 +292,41 @@ export function TaskDetailModal({ isOpen, onClose, task, members, currentUserId,
                     ))}
                 </select>
             </div>
+        )}
+
+        {/* REVIEW SECTION */}
+        {task.status === "DONE" && !task.isApproved && canAssign && (
+          <div style={{ borderTop: "2px dashed #000", paddingTop: "16px", marginTop: "8px" }}>
+            <label style={{ display: "block", fontSize: "12px", fontWeight: 900, color: "#000", marginBottom: "8px" }}>✅ REVIEW ADMIN</label>
+            {!isRevising ? (
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => handleReview("APPROVE")} disabled={loading} style={{ flex: 1, background: "#00D37F", color: "#000", border: "2px solid #000", padding: "8px", fontWeight: 800, cursor: "pointer", boxShadow: "2px 2px 0px #000" }}>
+                  Approve (+2 Poin)
+                </button>
+                <button onClick={() => setIsRevising(true)} disabled={loading} style={{ flex: 1, background: "#FF4D4D", color: "#000", border: "2px solid #000", padding: "8px", fontWeight: 800, cursor: "pointer", boxShadow: "2px 2px 0px #000" }}>
+                  Perlu Revisi
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <textarea 
+                  value={revisionNote}
+                  onChange={(e) => setRevisionNote(e.target.value)}
+                  placeholder="Tuliskan bagian mana yang perlu diperbaiki..."
+                  className="nb-textarea"
+                  style={{ width: "100%", padding: "8px", minHeight: "60px" }}
+                />
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button onClick={() => handleReview("REVISE")} disabled={loading} style={{ flex: 1, background: "#000", color: "#FFF", border: "2px solid #000", padding: "8px", fontWeight: 800, cursor: "pointer" }}>
+                    Kirim Revisi
+                  </button>
+                  <button onClick={() => setIsRevising(false)} disabled={loading} style={{ flex: 1, background: "#FFF", color: "#000", border: "2px solid #000", padding: "8px", fontWeight: 800, cursor: "pointer" }}>
+                    Batal
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
