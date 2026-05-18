@@ -13,10 +13,11 @@ export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isProtected = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+  const isCollabHub = /^\/project\/[^/]+\/hub($|\/)/.test(pathname);
 
   const content = (
     <div style={{ display: "flex", minHeight: "100vh", width: "100%" }}>
-      {session?.user && <Sidebar />}
+      {session?.user && !isCollabHub && <Sidebar />}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <Navbar />
         <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>

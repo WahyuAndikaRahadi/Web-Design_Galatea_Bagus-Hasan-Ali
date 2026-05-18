@@ -16,6 +16,7 @@ import { useUIStore } from "@/store/ui-store";
 export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const isCollabHub = /^\/project\/[^/]+\/hub($|\/)/.test(pathname);
   const toast = useToast();
   const { toggleSidebar } = useUIStore();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -117,7 +118,7 @@ export function Navbar() {
         boxShadow: "0 4px 0px rgba(0,0,0,0.05)", // Subtle shadow for depth
         position: "sticky",
         top: "0",
-        zIndex: 100,
+        zIndex: 2000,
         width: "100%",
       }}
     >
@@ -133,7 +134,7 @@ export function Navbar() {
           justifyContent: "space-between",
         }}
       >
-        {session?.user && (
+        {session?.user && !isCollabHub && (
           <button
             onClick={toggleSidebar}
             className="flex items-center justify-center"
