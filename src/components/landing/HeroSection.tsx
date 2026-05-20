@@ -298,17 +298,18 @@ export function HeroSection() {
             style={{ 
               display: "flex", 
               gap: "16px", 
-              flexDirection: "column",
+              flexDirection: "row",
+              flexWrap: "wrap",
               width: "100%",
-              maxWidth: "400px",
-              alignItems: "stretch",
+              maxWidth: "600px",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-            className="sm:flex-row sm:w-auto sm:max-w-none sm:justify-center"
           >
-            <Link href="/register" className="btn-primary btn-lg" id="hero-cta-register" style={{ width: "100%" }}>
+            <Link href="/register" className="btn-primary btn-lg" id="hero-cta-register" style={{ minWidth: "200px", textAlign: "center" }}>
               🚀 Mulai Gratis
             </Link>
-            <Link href="#explore-preview" className="btn-secondary btn-lg" id="hero-cta-explore" style={{ width: "100%" }}>
+            <Link href="#explore-preview" className="btn-secondary btn-lg" id="hero-cta-explore" style={{ minWidth: "200px", textAlign: "center" }}>
               Lihat Project →
             </Link>
           </motion.div>

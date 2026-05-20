@@ -30,7 +30,7 @@ export default async function HomePage() {
     where: {
       status: "OPEN",
     },
-    take: 4,
+    take: 3,
     orderBy: {
       createdAt: "desc",
     },
