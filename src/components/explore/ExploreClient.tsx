@@ -178,9 +178,9 @@ export function ProjectCard({ project, userSkills }: { project: Project; userSki
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: "2px solid #f0f0f0", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ position: "relative" }}>
+      <div style={{ borderTop: "2px solid #f0f0f0", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0, flex: 1 }}>
+            <div style={{ position: "relative", flexShrink: 0 }}>
                 {project.owner.image ? (
                   <img 
                       src={project.owner.image} 
@@ -194,12 +194,12 @@ export function ProjectCard({ project, userSkills }: { project: Project; userSki
                 )}
                 <div style={{ position: "absolute", bottom: -2, right: -2, width: "10px", height: "10px", background: "#00D37F", border: "1.5px solid #000", borderRadius: "50%" }} />
             </div>
-          <span style={{ fontSize: "13px", fontWeight: 700 }}>{project.owner.name}</span>
-          <span style={{ background: "#F5F0E8", border: "1.5px solid #000", borderRadius: "4px", padding: "1px 6px", fontSize: "11px", fontWeight: 800, fontFamily: "Space Grotesk, sans-serif" }}>
+          <span style={{ fontSize: "13px", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{project.owner.name}</span>
+          <span style={{ background: "#F5F0E8", border: "1.5px solid #000", borderRadius: "4px", padding: "1px 6px", fontSize: "11px", fontWeight: 800, fontFamily: "Space Grotesk, sans-serif", flexShrink: 0 }}>
             {project.owner.trustScore}
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
           <span
             style={{
               background: spotsLeft === 0 ? "#FF4D4D" : spotsLeft <= 1 ? "#FF8C00" : "#00D37F",
